@@ -1,21 +1,36 @@
 import { useEffect, useState } from "react"
+import TelegramAlert from "./components/TelegramAlert/TelegramAlert"
 
 function App() {
   const [initData, setInitData] = useState(null)
+
   useEffect(() => {
     if (window?.Telegram?.WebApp) {
-      const raw = window.Telegram.WebApp.initData;
+      const tg = window.Telegram.WebApp
 
-      const parsed = Object.fromEntries(new URLSearchParams(raw));
+      tg.ready()
 
-      console.log(parsed);
+      const raw = tg.initData
 
-      setInitData(parsed);
+      if (raw) {
+        const parsed = Object.fromEntries(new URLSearchParams(raw))
+        console.log(parsed)
+        setInitData(parsed)
+      } else {
+        console.log("initData пустий")
+      }
+    } else {
+      console.log("Telegram WebApp не знайдено")
     }
-  }, [window]);
+  }, [])
+
   return (
     <>
-      <pre>{JSON.stringify(initData, null, 2)}</pre>
+    {
+      initData ? 
+      <pre>{JSON.stringify(initData, null, 2)}</pre>: 
+      <TelegramAlert />
+    }
     </>
   )
 }
