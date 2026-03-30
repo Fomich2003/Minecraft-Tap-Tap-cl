@@ -12,10 +12,10 @@ function App() {
 
       setInitData(parsed);
     }
-  }, []);
+  }, [window]);
   return (
     <>
-      {initData && initData}
+      {initData}
     </>
   )
 }
