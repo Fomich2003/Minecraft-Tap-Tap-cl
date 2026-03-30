@@ -15,7 +15,7 @@ function App() {
   }, [window]);
   return (
     <>
-      {initData}
+      <pre>{JSON.stringify(initData, null, 2)}</pre>
     </>
   )
 }
