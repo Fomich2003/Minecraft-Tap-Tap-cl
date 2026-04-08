@@ -19,7 +19,7 @@ async function smartFetch(path, options = {}) {
         return {
             success: false,
             message: "Ой! Щось пішло не так, спробуйте пізніше...",
-            error: error.message
+            error: error
         }
     }
 }
