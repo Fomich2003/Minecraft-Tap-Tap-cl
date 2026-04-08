@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import TelegramAlert from "./components/TelegramAlert/TelegramAlert"
+import userService from "./services/user.service"
 
 function App() {
   const [initData, setInitData] = useState(null)
@@ -14,8 +15,10 @@ function App() {
 
       if (raw) {
         const parsed = Object.fromEntries(new URLSearchParams(raw))
+        userService.getProfile().then((data) => {
+          setInitData({parsed, data})
+        })
         console.log(parsed)
-        setInitData(parsed)
       } else {
         console.log("initData пустий")
       }
@@ -26,11 +29,11 @@ function App() {
 
   return (
     <>
-    {
-      initData ? 
-      <pre>{JSON.stringify(initData, null, 2)}</pre>: 
-      <TelegramAlert />
-    }
+      {
+        initData ?
+          <pre>{JSON.stringify(initData, null, 2)}</pre> :
+          <TelegramAlert />
+      }
     </>
   )
 }
