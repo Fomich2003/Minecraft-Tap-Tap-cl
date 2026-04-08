@@ -18,7 +18,8 @@ async function smartFetch(path, options = {}) {
         console.log(error.message)
         return {
             success: false,
-            message: "Ой! Щось пішло не так, спробуйте пізніше..."
+            message: "Ой! Щось пішло не так, спробуйте пізніше...",
+            error: error.message
         }
     }
 }
