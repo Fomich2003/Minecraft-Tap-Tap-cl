@@ -19,7 +19,15 @@
 
 body {
   font-family: 'Cormorant Garamond', serif;
+}
+
+.App {
   background: var(--bg);
+  max-width: 540px;
+  margin: 0 auto;
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 body.no-scroll {

@@ -1,10 +1,8 @@
 import { API_CONF } from "../config/api.config"
 
 async function smartFetch(path, options = {}) {
-    const debug = {}
     try {
         const response = await fetch(API_CONF.baseUrl + path, options)
-        debug.response = response
         const data = await response.json()
 
 
@@ -21,8 +19,7 @@ async function smartFetch(path, options = {}) {
         return {
             success: false,
             message: "Ой! Щось пішло не так, спробуйте пізніше...",
-            error: error.message,
-            debug
+            error: error.message
         }
     }
 }

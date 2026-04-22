@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import TelegramAlert from "./components/TelegramAlert/TelegramAlert"
 import userService from "./services/user.service"
+import NavBar from "./components/NavBar/NavBar"
 
 function App() {
   const [initData, setInitData] = useState(null)
@@ -28,13 +29,14 @@ function App() {
   }, [])
 
   return (
-    <>
-      {
+    <div className="App">
+      {/* {
         initData ?
           <pre>{JSON.stringify(initData, null, 2)}</pre> :
           <TelegramAlert />
-      }
-    </>
+      }  */}
+      <NavBar />
+    </div>
   )
 }
 
