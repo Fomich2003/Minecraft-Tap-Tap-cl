@@ -2,6 +2,9 @@ import { useEffect, useState } from "react"
 import TelegramAlert from "./components/TelegramAlert/TelegramAlert"
 import userService from "./services/user.service"
 import NavBar from "./components/NavBar/NavBar"
+import Home from "./pages/Home/Home"
+import Profile from "./pages/Profile/Profile"
+import Header from "./components/Header/Header"
 
 function App() {
   const [initData, setInitData] = useState(null)
@@ -17,7 +20,7 @@ function App() {
       if (raw) {
         const parsed = Object.fromEntries(new URLSearchParams(raw))
         userService.getProfile().then((data) => {
-          setInitData({parsed, data})
+          setInitData({ parsed, data })
         })
         console.log(parsed)
       } else {
@@ -35,6 +38,12 @@ function App() {
           <pre>{JSON.stringify(initData, null, 2)}</pre> :
           <TelegramAlert />
       }  */}
+
+      <Header />
+      <div className="content">
+        <Home />
+        <Profile />
+      </div>
       <NavBar />
     </div>
   )

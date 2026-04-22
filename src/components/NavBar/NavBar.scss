@@ -1,0 +1,39 @@
+.NavBar {
+    background-color: var(--accent);
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    width: 100%;
+    max-width: var(--max-content-width);
+    transform: translateX(-50%);
+
+    &__wrapper {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 var(--content-padding);
+        height: var(--navbar-height);
+        align-items: center;
+    }
+
+    &__link {
+        opacity: 0.6;
+        transition: all 0.3s;
+        display: block;
+        width: 48px;
+        height: 48px;
+        transform: scale(0.95);
+
+        &:hover {
+            opacity: 0.8;
+        }
+
+        &-active {
+            opacity: 1;
+            transform: scale(1.075);
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
+}

@@ -1,0 +1,17 @@
+.Header {
+    background-color: var(--accent);
+    position: fixed;
+    top: 0;
+    left: 50%;
+    width: 100%;
+    max-width: var(--max-content-width);
+    transform: translateX(-50%);
+
+    &__wrapper {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 var(--content-padding);
+        height: var(--navbar-height);
+        align-items: center;
+    }
+}
