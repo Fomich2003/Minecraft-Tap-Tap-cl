@@ -39,7 +39,7 @@ function App() {
 
       <div className="content">
         <Routes>
-          <Route path="/" element={<Home data={initData} />} />
+          <Route path="/" element={<Home initData={initData} />} />
           <Route path="profile" element={<Profile />} />
         </Routes>
       </div>
