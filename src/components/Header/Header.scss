@@ -14,4 +14,25 @@
         height: var(--navbar-height);
         align-items: center;
     }
+
+    &__logo svg {
+        width: 55px;
+        height: 55px;
+    }
+
+    &__balance {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        span {
+            color: var(--white);
+            font-size: 18px;
+        }
+
+        svg {
+            width: 36px;
+            height: 36px;
+        }
+    }
 }

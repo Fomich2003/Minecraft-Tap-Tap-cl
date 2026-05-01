@@ -5,6 +5,7 @@ import NavBar from "./components/NavBar/NavBar"
 import Home from "./pages/Home/Home"
 import Profile from "./pages/Profile/Profile"
 import Header from "./components/Header/Header"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
 
 function App() {
   const [initData, setInitData] = useState(null)
@@ -33,18 +34,22 @@ function App() {
 
   return (
     <div className="App">
-      {/* {
+      {
         initData ?
           <pre>{JSON.stringify(initData, null, 2)}</pre> :
           <TelegramAlert />
-      }  */}
-
+      } 
       <Header />
+
       <div className="content">
-        <Home />
-        <Profile />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="profile" element={<Profile />} />
+        </Routes>
       </div>
+
       <NavBar />
+
     </div>
   )
 }
