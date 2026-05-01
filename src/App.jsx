@@ -36,7 +36,7 @@ function App() {
     <div className="App">
       {
         initData ?
-          <pre>{JSON.stringify(initData, null, 2)}</pre> :
+          <pre>{JSON.stringify(initData.parsed.user, null, 2)}</pre> :
           <TelegramAlert />
       } 
       <Header />
