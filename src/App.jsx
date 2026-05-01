@@ -34,16 +34,12 @@ function App() {
 
   return (
     <div className="App">
-      {
-        initData ?
-          <pre>{JSON.stringify(initData.parsed.user, null, 2)}</pre> :
-          <TelegramAlert />
-      } 
+    
       <Header />
 
       <div className="content">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home data={initData} />} />
           <Route path="profile" element={<Profile />} />
         </Routes>
       </div>
