@@ -21,7 +21,7 @@ function App() {
       if (raw) {
         const parsed = Object.fromEntries(new URLSearchParams(raw))
         userService.getProfile().then((data) => {
-          setInitData({ parsed, data })
+          setInitData({ user: parsed.user, data })
         })
         console.log(parsed)
       } else {
