@@ -1,9 +1,9 @@
-function Home({ initData }) {
+import { useUserContext } from "../../context/UserContext"
 
-    if (!initData) return <p>Loading...</p>
+function Home() {
+    const { user, telegramData } = useUserContext()
+    const img = telegramData ? telegramData.photo_url : ""
 
-    const rawUser = JSON.parse(initData.user)
-    const img = rawUser.photo_url
     return (
         <main id="Home">
             <h1>Hello world!</h1>
