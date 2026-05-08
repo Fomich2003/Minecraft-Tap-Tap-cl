@@ -4,7 +4,7 @@ class UserService {
 
   async getProfile(telegramData) {
     return await smartFetch("/user/profile", {
-      body: JSON.stringify(telegramData),
+      body: JSON.stringify({telegramData}),
       method: "POST",
       headers: {
         "Content-Type": "application/json"
