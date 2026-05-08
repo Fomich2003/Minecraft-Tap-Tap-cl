@@ -2,7 +2,7 @@ import { useUserContext } from "../../context/UserContext"
 
 function Home() {
     const { user, telegramData } = useUserContext()
-    const img = telegramData ? telegramData.photo_url : ""
+    const img = telegramData ? telegramData.user.photo_url : ""
 
     return (
         <main id="Home">

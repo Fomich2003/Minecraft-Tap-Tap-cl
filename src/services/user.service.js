@@ -2,9 +2,15 @@ import smartFetch from "../utils/smartFetch"
 
 class UserService {
 
-   async getProfile() {
-     return await smartFetch("/user/profile")
-   }
+  async getProfile(telegramData) {
+    return await smartFetch("/user/profile", {
+      body: JSON.stringify(telegramData),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+  }
 
 
 }

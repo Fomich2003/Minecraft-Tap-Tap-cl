@@ -19,8 +19,8 @@ const UserProvider = ({ children }) => {
 
             if (raw) {
                 const parsed = Object.fromEntries(new URLSearchParams(raw))
-                setTelegramData(JSON.parse(parsed.user))
-                userService.getProfile().then((data) => {
+                setTelegramData(JSON.parse(parsed))
+                userService.getProfile(telegramData).then((data) => {
                     setUser(data.user)
                 })
                 setIsLoading(false)
