@@ -5,18 +5,20 @@ import Home from "./pages/Home/Home"
 import Profile from "./pages/Profile/Profile"
 import Header from "./components/Header/Header"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
+import { useUserContext } from "./context/UserContext"
 
 function App() {
-
+  const { user, isLoadingUser } = useUserContext()
+  if(!user || isLoadingUser) return <TelegramAlert />             
   return (
     <div className="App">
-    
+
       <Header />
 
       <div className="content">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="profile" element={<Profile />} />
+          <Route path="profile" element={<Profile user={user} />} />
         </Routes>
       </div>
 

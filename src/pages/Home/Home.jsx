@@ -1,11 +1,6 @@
-import { useUserContext } from "../../context/UserContext"
 import "./Home.scss"
 
 function Home() {
-    const { telegramData } = useUserContext()
-
-    const img = telegramData?.user?.photo_url
-    const username = telegramData?.user?.first_name || "Player"
 
     return (
         <main id="Home">
