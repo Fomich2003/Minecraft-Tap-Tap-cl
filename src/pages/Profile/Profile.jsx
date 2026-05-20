@@ -26,46 +26,42 @@ function Profile({ user }) {
         )
     }
     return (
-        // <main id="Profile">
-        //     <div className="Profile__wrapper">
-        //         <div className="Profile__user">
-        //             <div className="Profile__photo">
-        //                 <img src={user.photo} alt={user.username} />
-        //             </div>
-        //             <div className="Profile__info">
-        //                 <h1>{user.username}</h1>
-        //                 <p>ID: {user.telegramId}</p>
-        //                 <div className="Profile__info-stats">
-        //                     <div className="Profile__info-stat">
-        //                         <Logo />
-        //                         <span>
-        //                             {user.tapBlocks.length}
-        //                         </span>
-        //                     </div>
-        //                     <div className="Profile__info-stat">
-        //                         <Logo />
-        //                         <span>
-        //                             {user.inventory.length}
-        //                         </span>
-        //                     </div>
-        //                 </div>
-        //             </div>
-        //         </div>
-        //         <div className="Profile__gift">
-        //             {
-        //                 renderBonusState()
-        //             }
-        //         </div>
-        //         <div className="Profile__blocks">
+        <main id="Profile">
+            <div className="Profile__wrapper">
+                <div className="Profile__user">
+                    <div className="Profile__photo">
+                        <img src={user.photo} alt={user.username} />
+                    </div>
+                    <div className="Profile__info">
+                        <h1>{user.username}</h1>
+                        <p>ID: {user.telegramId}</p>
+                        <div className="Profile__info-stats">
+                            <div className="Profile__info-stat">
+                                <Logo />
+                                <span>
+                                    {user.tapBlocks.length}
+                                </span>
+                            </div>
+                            <div className="Profile__info-stat">
+                                <Logo />
+                                <span>
+                                    {user.inventory.length}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="Profile__gift">
+                    {
+                        renderBonusState()
+                    }
+                </div>
+                <div className="Profile__blocks">
 
-        //         </div>
-        //     </div>
-        // </main>
-        <p>
-            {
-                JSON.stringify(user, null, 2)
-            }
-        </p>
+                </div>
+            </div>
+        </main>
+
     )
 }
 
