@@ -1,5 +1,5 @@
 import { useUserContext } from "../../context/UserContext"
-import "./home.scss"
+import "./Home.scss"
 
 function Home() {
     const { telegramData } = useUserContext()
