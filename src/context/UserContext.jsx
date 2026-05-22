@@ -33,8 +33,8 @@ const UserProvider = ({ children }) => {
     }, [])
 
     const handleClaimAward = async () => {
-
-        if (!telegramData) return { success: false, message: "telegramData is invalid" }
+        if (window) window.alert("OK")
+            if (!telegramData) return { success: false, message: "telegramData is invalid" }
 
         const result = await userService.claimAward(telegramData)
 
