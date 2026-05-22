@@ -13,6 +13,16 @@ class UserService {
   }
 
 
+  async claimAward(telegramData) {
+    return await smartFetch("/user/claim-award", {
+      body: JSON.stringify({telegramData}),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+  }
+
 }
 
 const userService = new UserService()

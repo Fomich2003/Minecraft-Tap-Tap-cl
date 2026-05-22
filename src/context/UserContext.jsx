@@ -18,9 +18,7 @@ const UserProvider = ({ children }) => {
             const raw = tg.initData
 
             if (raw) {
-                const parsed = Object.fromEntries(new URLSearchParams(raw))
-                // setTelegramData(JSON.parse(parsed))
-                setTelegramData(parsed)
+                setTelegramData(raw)
                 userService.getProfile(raw).then((data) => {
                     setUser(data.user)
                 })
@@ -34,8 +32,17 @@ const UserProvider = ({ children }) => {
 
     }, [])
 
+    const handleClaimAward = async () => {
+
+        if (!telegramData) return { success: false, message: "telegramData is invalid" }
+
+        const result = await userService.claimAward(telegramData)
+
+        return result
+    };
+
     return (
-        <UserContext.Provider value={{ user, telegramData, isLoadingUser, setUser }}>
+        <UserContext.Provider value={{ user, telegramData, isLoadingUser, setUser, handleClaimAward }}>
             {children}
         </UserContext.Provider>
     );

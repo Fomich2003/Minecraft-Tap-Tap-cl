@@ -1,16 +1,18 @@
 import "./Profile.scss"
 import { use, useState } from "react"
 import { Logo, OpenChestIcon, CloseChestIcon } from "../../utils/icons"
+import userService from "../../services/user.service"
+import { useUserContext } from "../../context/UserContext"
 
-function Profile({ user }) {
-
+function Profile() {
+    const { user, handleClaimAward } = useUserContext()
     const [bonusStatus, setBonusStatus] = useState(false)
     const renderBonusState = () => {
         return (
             <>
                 <div className="Profile__gift-chest">
                     {
-                        bonusStatus ? <OpenChestIcon /> : <CloseChestIcon />
+                        bonusStatus ? <OpenChestIcon onClick={handleClaimAward} /> : <CloseChestIcon />
                     }
                 </div>
                 <div className="Profile__gift-text">
