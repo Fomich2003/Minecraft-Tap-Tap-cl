@@ -3,16 +3,17 @@ import { use, useState } from "react"
 import { Logo, OpenChestIcon, CloseChestIcon } from "../../utils/icons"
 import userService from "../../services/user.service"
 import { useUserContext } from "../../context/UserContext"
+import has24HoursPassed from "../../utils/convertTime"
 
 function Profile() {
     const { user, handleClaimAward } = useUserContext()
-    const [bonusStatus, setBonusStatus] = useState(false)
+    const [bonusStatus, setBonusStatus] = useState(user.lastAwardTime ? has24HoursPassed(user.lastAwardTime) : true)
     const renderBonusState = () => {
         return (
             <>
                 <div className="Profile__gift-chest">
                     {
-                        bonusStatus ? <OpenChestIcon /> : <button onClick={handleClaimAward}> <CloseChestIcon /> </button>
+                        bonusStatus ? <button onClick={handleClaimAward}><OpenChestIcon /></button> : <CloseChestIcon />
                     }
                 </div>
                 <div className="Profile__gift-text">
