@@ -12,7 +12,7 @@ function Profile() {
             <>
                 <div className="Profile__gift-chest">
                     {
-                        bonusStatus ? <OpenChestIcon onClick={handleClaimAward} /> : <CloseChestIcon />
+                        bonusStatus ? <OpenChestIcon  /> : <CloseChestIcon onClick={handleClaimAward} />
                     }
                 </div>
                 <div className="Profile__gift-text">
