@@ -20,10 +20,10 @@ function Profile() {
 
                     <h2>Daily bonus</h2>
                     {
-                        bonusStatus ? <p>Get your free award!</p> : <p>You already got award!</p>
+                        bonusStatus ? <p>Get your free award!{user.lastAwardTime}</p> : <p>You already got award!</p>
 
                     }
-                    {!bonusStatus && <span>25:00</span>}
+                    {!bonusStatus && <span>24:00</span>}
                 </div>
             </>
         )
