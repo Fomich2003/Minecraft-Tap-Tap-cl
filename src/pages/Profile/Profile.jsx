@@ -1,5 +1,5 @@
 import "./Profile.scss"
-import { use, useState } from "react"
+import { use, useState, useEffect } from "react"
 import { Logo, OpenChestIcon, CloseChestIcon } from "../../utils/icons"
 import userService from "../../services/user.service"
 import { useUserContext } from "../../context/UserContext"
@@ -8,7 +8,6 @@ import { has24HoursPassed, getRemainingTime } from "../../utils/convertTime"
 function Profile() {
     const { user, handleClaimAward } = useUserContext()
     const [timer, setTimer] = useState("")
-    const bonusStatus = user.lastAwardTime ? has24HoursPassed(user.lastAwardTime) : true
     useEffect(() => {
         if (!user.lastAwardTime) return
 
@@ -23,6 +22,7 @@ function Profile() {
         return () => clearInterval(interval)
 
     }, [user.lastAwardTime])
+    const bonusStatus = user.lastAwardTime ? has24HoursPassed(user.lastAwardTime) : true
     const renderBonusState = () => {
         return (
             <>
