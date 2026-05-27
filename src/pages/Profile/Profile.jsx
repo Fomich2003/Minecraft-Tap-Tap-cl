@@ -3,11 +3,26 @@ import { use, useState } from "react"
 import { Logo, OpenChestIcon, CloseChestIcon } from "../../utils/icons"
 import userService from "../../services/user.service"
 import { useUserContext } from "../../context/UserContext"
-import has24HoursPassed from "../../utils/convertTime"
+import { has24HoursPassed, getRemainingTime } from "../../utils/convertTime"
 
 function Profile() {
     const { user, handleClaimAward } = useUserContext()
+    const [timer, setTimer] = useState("")
     const bonusStatus = user.lastAwardTime ? has24HoursPassed(user.lastAwardTime) : true
+    useEffect(() => {
+        if (!user.lastAwardTime) return
+
+        const updateTimer = () => {
+            setTimer(getRemainingTime(user.lastAwardTime))
+        }
+
+        updateTimer()
+
+        const interval = setInterval(updateTimer, 1000)
+
+        return () => clearInterval(interval)
+
+    }, [user.lastAwardTime])
     const renderBonusState = () => {
         return (
             <>
@@ -20,10 +35,10 @@ function Profile() {
 
                     <h2>Daily bonus</h2>
                     {
-                        bonusStatus ? <p>Get your free award!{user.lastAwardTime}</p> : <p>You already got award!</p>
+                        bonusStatus ? <p>Get your free award!</p> : <p>You already got award!</p>
 
                     }
-                    {!bonusStatus && <span>24:00</span>}
+                    {!bonusStatus && <span>{timer}</span>}
                 </div>
             </>
         )
