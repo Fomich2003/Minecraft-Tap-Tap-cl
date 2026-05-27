@@ -6,39 +6,78 @@ import { useUserContext } from "../../context/UserContext"
 import { has24HoursPassed, getRemainingTime } from "../../utils/convertTime"
 
 function Profile() {
+
+    // отримуємо user та функцію отримання бонусу з context
     const { user, handleClaimAward } = useUserContext()
+
+    // state для countdown таймера
     const [timer, setTimer] = useState("")
+
+    // запускається коли змінюється lastAwardTime
     useEffect(() => {
+
+        // якщо користувач ще не отримував бонус
         if (!user.lastAwardTime) return
 
+        // функція оновлення таймера
         const updateTimer = () => {
+
+            // записуємо новий час у state
             setTimer(getRemainingTime(user.lastAwardTime))
         }
 
+        // одразу запускаємо таймер
         updateTimer()
 
+        // оновлюємо таймер кожну секунду
         const interval = setInterval(updateTimer, 1000)
 
+        // очищаємо interval при розмонтуванні компонента
         return () => clearInterval(interval)
 
     }, [user.lastAwardTime])
-    const bonusStatus = user.lastAwardTime ? has24HoursPassed(user.lastAwardTime) : true
+
+    // перевіряємо чи доступний бонус
+    const bonusStatus = user.lastAwardTime
+        ? has24HoursPassed(user.lastAwardTime)
+        : true
+
+    // функція рендера блоку бонусу
     const renderBonusState = () => {
+
         return (
             <>
                 <div className="Profile__gift-chest">
+
                     {
-                        bonusStatus ? <button onClick={handleClaimAward}><OpenChestIcon /></button> : <CloseChestIcon />
+                        // якщо бонус доступний показуємо кнопку
+                        bonusStatus
+                            ? (
+                                <button onClick={handleClaimAward}>
+                                    <OpenChestIcon />
+                                </button>
+                            )
+                            : <CloseChestIcon />
                     }
+
                 </div>
+
                 <div className="Profile__gift-text">
 
                     <h2>Daily bonus</h2>
-                    {
-                        bonusStatus ? <p>Get your free award!</p> : <p>You already got award!</p>
 
+                    {
+                        // текст залежно від статусу бонусу
+                        bonusStatus
+                            ? <p>Get your free award!</p>
+                            : <p>You already got award!</p>
                     }
-                    {!bonusStatus && <span>{timer}</span>}
+
+                    {
+                        // якщо бонус недоступний показуємо countdown
+                        !bonusStatus && <span>{timer}</span>
+                    }
+
                 </div>
             </>
         )
@@ -75,6 +114,17 @@ function Profile() {
                     }
                 </div>
                 <div className="Profile__blocks">
+                    <h2>My blocks:</h2>
+                    {
+                        Array.isArray(user.tapBlocks) && user.tapBlocks.length > 0 ?
+                            <div className="Profile__blocks-list">
+                               1
+                               2
+                               3
+                            </div> : <div className="Profile__blocks-get">
+                                <button>Get first block</button>
+                            </div>
+                    }
 
                 </div>
             </div>
