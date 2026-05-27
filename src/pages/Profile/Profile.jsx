@@ -7,7 +7,7 @@ import has24HoursPassed from "../../utils/convertTime"
 
 function Profile() {
     const { user, handleClaimAward } = useUserContext()
-    const [bonusStatus, setBonusStatus] = useState(user.lastAwardTime ? has24HoursPassed(user.lastAwardTime) : true)
+    const bonusStatus = user.lastAwardTime ? has24HoursPassed(user.lastAwardTime) : true
     const renderBonusState = () => {
         return (
             <>
