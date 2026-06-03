@@ -1,12 +1,18 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import userService from "../services/user.service";
+import blockService from "../services/block.service";
 
 const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+
+    const [userBlocks, setUserBlocks] = useState([]);
+
     const [telegramData, setTelegramData] = useState(null);
+
     const [isLoadingUser, setIsLoading] = useState(true);
+
 
     useEffect(() => {
 
@@ -43,8 +49,22 @@ const UserProvider = ({ children }) => {
         return result
     };
 
+
+    const getFirstBlock = async () => {
+        if (!telegramData) return { success: false, message: "telegramData is invalid" }
+
+        const result = await blockService.getFirstBlock(telegramData)
+
+        if (result.firstBlock) setUserBlocks(prev => ([
+            ...prev,
+            result.firstBlock
+        ]))
+
+        return result
+    };
+
     return (
-        <UserContext.Provider value={{ user, telegramData, isLoadingUser, setUser, handleClaimAward }}>
+        <UserContext.Provider value={{ user, userBlocks, telegramData, isLoadingUser, setUser, handleClaimAward, getFirstBlock }}>
             {children}
         </UserContext.Provider>
     );
