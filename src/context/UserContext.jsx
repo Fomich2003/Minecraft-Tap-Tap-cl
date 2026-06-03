@@ -27,6 +27,7 @@ const UserProvider = ({ children }) => {
                 setTelegramData(raw)
                 userService.getProfile(raw).then((data) => {
                     setUser(data.user)
+                    setUserBlocks(data.user.tapBlocks)
                 })
                 setIsLoading(false)
             } else {
@@ -55,9 +56,9 @@ const UserProvider = ({ children }) => {
 
         const result = await blockService.getFirstBlock(telegramData)
 
-        if (result.firstBlock) setUserBlocks(prev => ([
+        if (result.block) setUserBlocks(prev => ([
             ...prev,
-            result.firstBlock
+            result.block
         ]))
 
         return result
