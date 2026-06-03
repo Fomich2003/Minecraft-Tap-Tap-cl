@@ -100,6 +100,25 @@
         }
     }
 
+    &__blocks {
 
+
+        &-getBtn {
+            width: 100%;
+            height: 40px;
+            border-radius: 15px;
+            border: none;
+            background: var(--accent);
+            color: var(--white);
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;  
+        }
+
+        &-wrapper {
+            padding: 12px 0;
+
+        }
+    }
 
 }

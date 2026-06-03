@@ -117,12 +117,12 @@ function Profile() {
                     <h2>My blocks:</h2>
                     {
                         Array.isArray(user.tapBlocks) && user.tapBlocks.length > 0 ?
-                            <div className="Profile__blocks-list">
-                               1
-                               2
-                               3
-                            </div> : <div className="Profile__blocks-get">
-                                <button>Get first block</button>
+                            <div className="Profile__blocks-list Profile__blocks-wrapper">
+                                1
+                                2
+                                3
+                            </div> : <div className="Profile__blocks-get Profile__blocks-wrapper">
+                                <button className="Profile__blocks-getBtn">Get first block</button>
                             </div>
                     }
 
