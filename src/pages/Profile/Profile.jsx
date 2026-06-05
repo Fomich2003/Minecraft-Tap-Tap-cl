@@ -4,6 +4,7 @@ import { Logo, OpenChestIcon, CloseChestIcon } from "../../utils/icons"
 import userService from "../../services/user.service"
 import { useUserContext } from "../../context/UserContext"
 import { has24HoursPassed, getRemainingTime } from "../../utils/convertTime"
+import ServerImage from "../../components/serverImage/serverImage"
 
 function Profile() {
 
@@ -120,12 +121,8 @@ function Profile() {
                             <div className="Profile__blocks-list Profile__blocks-wrapper">
                                 {userBlocks.map((block) => (
                                     <div key={block._id} className="Profile__block-card">
-                                        <img
-                                            src={block.icon}
-                                            alt={block.name}
-                                            className="Profile__block-image"
-                                        />
 
+                                        <ServerImage imgSrc={block.icon} imgClass="Profile__block-image" />
                                         <div className="Profile__block-info">
                                             <h3>{block.name}</h3>
                                             <p>Slug: {block.slug}</p>
