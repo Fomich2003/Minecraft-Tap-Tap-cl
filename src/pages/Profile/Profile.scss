@@ -121,4 +121,56 @@
         }
     }
 
+      &__blocks-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    &__block-card {
+        background: #1f1f1f;
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 16px;
+        padding: 15px;
+        transition: .2s;
+
+        &:hover {
+            transform: translateY(-3px);
+        }
+    }
+
+    &__block-image {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto 12px;
+    }
+
+    &__block-info {
+        text-align: center;
+
+        h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        p {
+            font-size: 14px;
+            opacity: .7;
+            margin-bottom: 10px;
+        }
+    }
+
+    &__block-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: var(--accent);
+        color: white;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
 }

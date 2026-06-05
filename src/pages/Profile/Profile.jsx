@@ -118,9 +118,26 @@ function Profile() {
                     {
                         Array.isArray(userBlocks) && userBlocks.length > 0 ?
                             <div className="Profile__blocks-list Profile__blocks-wrapper">
-                          {
-                              JSON.stringify(userBlocks[0])
-                          }
+                                {userBlocks.map((block) => (
+                                    <div key={block._id} className="Profile__block-card">
+                                        <img
+                                            src={block.icon}
+                                            alt={block.name}
+                                            className="Profile__block-image"
+                                        />
+
+                                        <div className="Profile__block-info">
+                                            <h3>{block.name}</h3>
+                                            <p>Slug: {block.slug}</p>
+
+                                            {block.canTap && (
+                                                <span className="Profile__block-badge">
+                                                    Tap available
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
                             </div> : <div className="Profile__blocks-get Profile__blocks-wrapper">
                                 <button onClick={getFirstBlock} className="Profile__blocks-getBtn">Get first block</button>
                             </div>
