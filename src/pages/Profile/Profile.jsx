@@ -119,7 +119,7 @@ function Profile() {
                         Array.isArray(userBlocks) && userBlocks.length > 0 ?
                             <div className="Profile__blocks-list Profile__blocks-wrapper">
                           {
-                            userBlocks[0].name
+                              JSON.stringify(userBlocks[0])
                           }
                             </div> : <div className="Profile__blocks-get Profile__blocks-wrapper">
                                 <button onClick={getFirstBlock} className="Profile__blocks-getBtn">Get first block</button>
