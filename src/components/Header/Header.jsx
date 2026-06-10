@@ -5,12 +5,7 @@ import { useUserContext } from "../../context/UserContext"
 import { useEffect, useState } from "react"
 
 function Header() {
-    const [balance, setBalance] = useState(0)
     const { user, isLoadingUser } = useUserContext()
-    useEffect(() => {
-        if (!user) return 
-        setBalance(user.balance) 
-    }, [user])
     if (!user || isLoadingUser) return null
     return (
         <header className="Header">
@@ -19,7 +14,7 @@ function Header() {
                     <Logo />
                 </Link>
                 <div className="Header__balance">
-                    <span>{balance}</span>
+                    <span>{user.balance}</span>
                     <CoinIcon />
                 </div>
             </div>

@@ -45,7 +45,8 @@ const UserProvider = ({ children }) => {
         const result = await userService.claimAward(telegramData)
         if (result.user) setUser(prev => ({
             ...prev,
-            lastAwardTime: result.user.lastAwardTime
+            lastAwardTime: result.user.lastAwardTime,
+            balance: result.user.balance
         }))
         return result
     };
