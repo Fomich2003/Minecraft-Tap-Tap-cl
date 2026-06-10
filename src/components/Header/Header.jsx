@@ -3,7 +3,9 @@ import { Logo, CoinIcon } from "../../utils/icons"
 import { Link } from "react-router-dom"
 
 
-function Header({ balance = 0 }) {
+function Header() {
+    const { user, isLoadingUser } = useUserContext()
+    if (!user || isLoadingUser) return null
     return (
         <header className="Header">
             <div className="Header__wrapper">
@@ -11,7 +13,7 @@ function Header({ balance = 0 }) {
                     <Logo />
                 </Link>
                 <div className="Header__balance">
-                    <span>{balance}</span>
+                    <span>{user.balance}</span>
                     <CoinIcon />
                 </div>
             </div>

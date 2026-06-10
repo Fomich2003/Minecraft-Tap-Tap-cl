@@ -13,7 +13,7 @@ function App() {
   return (
     <div className="App">
 
-      <Header balance={user.balance} />
+      <Header />
 
       <div className="content">
         <Routes>
