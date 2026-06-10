@@ -1,7 +1,7 @@
 import "./Header.scss"
 import { Logo, CoinIcon } from "../../utils/icons"
 import { Link } from "react-router-dom"
-
+import { useUserContext } from "../../context/UserContext"
 
 function Header() {
     const { user, isLoadingUser } = useUserContext()
