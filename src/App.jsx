@@ -6,10 +6,11 @@ import Profile from "./pages/Profile/Profile"
 import Header from "./components/Header/Header"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import { useUserContext } from "./context/UserContext"
+import Tap from "./pages/Tap/Tap"
 
 function App() {
   const { user, isLoadingUser } = useUserContext()
-  if(!user || isLoadingUser) return <TelegramAlert />             
+  if (!user || isLoadingUser) return <TelegramAlert />
   return (
     <div className="App">
 
@@ -19,6 +20,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="profile" element={<Profile user={user} />} />
+          <Route path="tap" element={<Tap />} />
         </Routes>
       </div>
 
