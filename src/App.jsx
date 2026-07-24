@@ -19,8 +19,8 @@ function App() {
       <div className="content">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="profile" element={<Profile user={user} />} />
-          <Route path="tap" element={<Tap />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/tap" element={<Tap />} />
         </Routes>
       </div>
 
