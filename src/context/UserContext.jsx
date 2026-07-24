@@ -65,8 +65,30 @@ const UserProvider = ({ children }) => {
         return result
     };
 
+    const tapBlock = async (slug) => {
+        if (!telegramData) return { success: false, message: "telegramData is invalid" }
+
+        const result = await blockService.tapBlock(telegramData, slug)
+        // if (result.user) setUser(prev => ({
+        //     ...prev,
+        //     lastAwardTime: result.user.lastAwardTime,
+        //     balance: result.user.balance
+        // }))
+        return result
+    };
+
+
     return (
-        <UserContext.Provider value={{ user, userBlocks, telegramData, isLoadingUser, setUser, handleClaimAward, getFirstBlock }}>
+        <UserContext.Provider value={{
+            user,
+            userBlocks,
+            telegramData,
+            isLoadingUser,
+            setUser,
+            handleClaimAward,
+            getFirstBlock,
+            tapBlock
+        }}>
             {children}
         </UserContext.Provider>
     );

@@ -1,16 +1,15 @@
 import "./Tap.scss"
 import { DefaultBlockIcon } from "../../utils/icons"
 import { useUserContext } from "../../context/UserContext"
-import blockService from "../../services/block.service"
 
 function Tap() {
-    const { user, userBlocks } = useUserContext()
+    const { user, userBlocks, tapBlock } = useUserContext()
 
     return (
         <main id="Tap">
             <div className="Tap__wrapper">
                 <div className="Tap__block">
-                    <button className="Tap__block-btn">
+                    <button className="Tap__block-btn" onClick={() => tapBlock(userBlocks[0].slug)}>
                         <DefaultBlockIcon />
                         {userBlocks[0].slug}
                     </button>

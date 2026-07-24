@@ -1,7 +1,6 @@
 import "./Profile.scss"
 import { use, useState, useEffect } from "react"
 import { Logo, OpenChestIcon, CloseChestIcon } from "../../utils/icons"
-import userService from "../../services/user.service"
 import { useUserContext } from "../../context/UserContext"
 import { has24HoursPassed, getRemainingTime } from "../../utils/convertTime"
 import ServerImage from "../../components/ServerImage/ServerImage"
