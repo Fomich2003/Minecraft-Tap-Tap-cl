@@ -9,7 +9,7 @@ import { useUserContext } from "./context/UserContext"
 import Tap from "./pages/Tap/Tap"
 
 function App() {
-  const { user, isLoadingUser } = useUserContext()
+  const { user, isLoadingUser } = useUserContext()           
   if (!user || isLoadingUser) return <TelegramAlert />
   return (
     <div className="App">

@@ -12,6 +12,28 @@ class BlockService {
         })
     }
 
+    async getUserBlocks(telegramData) {
+        return await smartFetch("/block/get-userblocks", {
+            body: JSON.stringify({ telegramData }),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+    }
+
+
+    async tapBlock(telegramData, slug) {
+        return await smartFetch("/block/tap", {
+            body: JSON.stringify({ telegramData, slug }),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+    }
+
+
 
 
 }
