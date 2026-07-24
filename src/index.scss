@@ -23,7 +23,7 @@
 
 body {
   font-family: 'Cormorant Garamond', serif;
-}     
+}
 
 .App {
   background: var(--bg);
@@ -58,6 +58,6 @@ body.no-scroll {
 
 .content {
   padding: 0 var(--content-padding);
-padding-top: calc(var(--header-height) + 20px);
-padding-bottom: calc(var(--navbar-height) + 20px);
+  padding-top: calc(var(--header-height) + 20px);
+  padding-bottom: calc(var(--navbar-height) + 20px);
 }
