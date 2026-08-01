@@ -18,7 +18,7 @@ function Tap() {
             sendTapsBlock(userBlocks[0].slug, count)
             setCount(0)
             setBlockBtn(false)
-        }, 1000)
+        }, 500)
         return () => clearTimeout(timer)
     }, [count])
 
