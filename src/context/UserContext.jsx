@@ -65,15 +65,14 @@ const UserProvider = ({ children }) => {
         return result
     };
 
-    const tapBlock = async (slug) => {
+    const sendTapsBlock = async (slug, count) => {
         if (!telegramData) return { success: false, message: "telegramData is invalid" }
 
-        const result = await blockService.tapBlock(telegramData, slug)
-        // if (result.user) setUser(prev => ({
-        //     ...prev,
-        //     lastAwardTime: result.user.lastAwardTime,
-        //     balance: result.user.balance
-        // }))
+        const result = await blockService.sendTapsBlock(telegramData, slug, count)
+        if (result.user) setUser(prev => ({
+            ...prev,
+            balance: result.user.balance
+        }))
         return result
     };
 
@@ -87,7 +86,7 @@ const UserProvider = ({ children }) => {
             setUser,
             handleClaimAward,
             getFirstBlock,
-            tapBlock
+            sendTapsBlock
         }}>
             {children}
         </UserContext.Provider>

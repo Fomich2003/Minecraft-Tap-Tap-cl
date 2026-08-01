@@ -23,9 +23,9 @@ class BlockService {
     }
 
 
-    async tapBlock(telegramData, slug) {
+    async sendTapsBlock(telegramData, slug, count) {
         return await smartFetch("/block/tap", {
-            body: JSON.stringify({ telegramData, slug }),
+            body: JSON.stringify({ telegramData, slug, count }),
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
