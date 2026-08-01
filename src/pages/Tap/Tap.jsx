@@ -10,13 +10,14 @@ function Tap() {
 
     const incrementCount = (num) => {
         setCount((prev) => prev + num)
+        setCountToShow((prev) => prev + num)
     }
 
 
     useEffect(() => {
         setUser(prev => ({
             ...prev,
-            balance: user.balance + count
+            balance: user.balance + 1
         }))
         const timer = setTimeout(() => {
             setBlockBtn(true)
