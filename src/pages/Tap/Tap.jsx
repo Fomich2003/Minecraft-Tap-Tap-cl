@@ -4,7 +4,7 @@ import { useUserContext } from "../../context/UserContext"
 import { useState, useEffect } from "react"
 
 function Tap() {
-    const { user, userBlocks, sendTapsBlock } = useUserContext()
+    const { user, setUser, userBlocks, sendTapsBlock } = useUserContext()
     const [count, setCount] = useState(0)
     const [blockBtn, setBlockBtn] = useState(false)
 
@@ -12,15 +12,22 @@ function Tap() {
         setCount((prev) => prev + num)
     }
 
+
     useEffect(() => {
+        setUser(prev => ({
+            ...prev,
+            balance: user.balance + count
+        }))
         const timer = setTimeout(() => {
             setBlockBtn(true)
             sendTapsBlock(userBlocks[0].slug, count)
             setCount(0)
             setBlockBtn(false)
-        }, 500)
+        }, 1000)
         return () => clearTimeout(timer)
     }, [count])
+
+
 
     // onClick={() => sendTapsBlock(userBlocks[0].slug)}>
     return (
