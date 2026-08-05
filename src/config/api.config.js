@@ -1,7 +1,14 @@
-const API_CONF = {
-    // baseUrl: `http://localhost:6788/api`
-    baseUrl: `https://stump-facial-tannery.ngrok-free.dev/api`,
-    baseFileUrl: `https://stump-facial-tannery.ngrok-free.dev`
+const mode = import.meta.env.MODE;
+
+const CLIENT_CONF = {
+    mode,
+    serverUrl: mode === "production" ?
+        `https://stump-facial-tannery.ngrok-free.dev` : "http://localhost:6788"
 }
 
-export { API_CONF }
+const API_CONF = {
+    baseUrl: `${CLIENT_CONF.serverUrl}/api`,
+    baseFileUrl: CLIENT_CONF.serverUrl
+}
+
+export { API_CONF, CLIENT_CONF }

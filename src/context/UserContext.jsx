@@ -1,6 +1,8 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import userService from "../services/user.service";
 import blockService from "../services/block.service";
+import { CLIENT_CONF } from "../config/api.config";
+import { data } from "react-router-dom";
 
 const UserContext = createContext();
 
@@ -15,6 +17,16 @@ const UserProvider = ({ children }) => {
 
 
     useEffect(() => {
+        if (CLIENT_CONF.mode === "development") {
+            setTelegramData("test")
+            userService.getProfile().then((data) => {
+                setUser(data.user)
+                setUserBlocks(data.user.tapBlocks)
+            })
+            setIsLoading(false)
+
+            return
+        }
 
         if (window?.Telegram?.WebApp) {
             const tg = window.Telegram.WebApp
