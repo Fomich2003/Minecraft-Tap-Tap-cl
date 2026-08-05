@@ -13,7 +13,7 @@ function Tap() {
         
         setUser(prev => ({
             ...prev,
-            balance: prev.balance + 1
+            balance: prev.balance + num
         }))
     }
 
