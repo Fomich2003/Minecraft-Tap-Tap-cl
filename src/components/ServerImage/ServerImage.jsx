@@ -5,7 +5,7 @@ function ServerImage({ imgSrc, imgClass = "" }) {
     return (
         <>
             <img className={`ServerImage ${imgClass}`} src={API_CONF.baseFileUrl + imgSrc} alt="photo" />
-            <p>{API_CONF.baseFileUrl + imgSrc}</p>
+            {/* <p>{API_CONF.baseFileUrl + imgSrc}</p> */}
         </>
 
 

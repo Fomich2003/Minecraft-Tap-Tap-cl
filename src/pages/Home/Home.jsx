@@ -1,7 +1,8 @@
 import "./Home.scss"
+import { useNavigate } from "react-router-dom"
 
 function Home() {
-
+    const navigate = useNavigate()
     return (
         <main id="Home">
             <section className="hero">
@@ -71,7 +72,10 @@ function Home() {
                     <h4>Крафть щось на верстаку</h4>
                 </div>
 
-                <button className="play__btn">Почати гру!</button>
+
+                <button className="play__btn" onClick={() => navigate("/game")}>
+                    Почати гру!
+                </button>
             </section>
         </main>
     )

@@ -112,7 +112,7 @@
             color: var(--white);
             font-size: 17px;
             font-weight: 500;
-            cursor: pointer;  
+            cursor: pointer;
         }
 
         &-wrapper {
@@ -121,18 +121,21 @@
         }
     }
 
-      &__blocks-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 15px;
+    &__blocks-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
         margin-top: 15px;
     }
 
     &__block-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
         background: #1f1f1f;
-        border: 1px solid rgba(255,255,255,.08);
+        border: 1px solid rgba(255, 255, 255, .08);
         border-radius: 16px;
-        padding: 15px;
+        padding: 12px;
         transition: .2s;
 
         &:hover {
@@ -141,36 +144,59 @@
     }
 
     &__block-image {
-        width: 80px;
-        height: 80px;
+        width: 90px;
+        height: 90px;
         object-fit: contain;
-        display: block;
-        margin: 0 auto 12px;
+        flex-shrink: 0;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, .03);
     }
 
     &__block-info {
-        text-align: center;
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
 
         h3 {
             font-size: 18px;
-            margin-bottom: 8px;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: white;
         }
 
         p {
             font-size: 14px;
             opacity: .7;
-            margin-bottom: 10px;
+            margin: 0;
+            color: white;
         }
     }
 
     &__block-badge {
-        display: inline-block;
+        align-self: flex-start;
         padding: 5px 10px;
         border-radius: 999px;
         background: var(--accent);
         color: white;
         font-size: 13px;
         font-weight: 500;
+    }
+
+    &__block-status {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .15);
+        flex-shrink: 0;
+
+        &--active {
+            background: #2ecc71;
+            box-shadow: 0 0 6px rgba(46, 204, 113, .7);
+        }
     }
 
 }

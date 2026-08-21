@@ -11,7 +11,6 @@ class BlockService {
             }
         })
     }
-
     async getUserBlocks(telegramData) {
         return await smartFetch("/block/get-userblocks", {
             body: JSON.stringify({ telegramData }),
@@ -22,6 +21,14 @@ class BlockService {
         })
     }
 
+    async getBlocksToTap() {
+        return await smartFetch("/block/all-taps", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+    }
 
     async sendTapsBlock(telegramData, slug, count) {
         return await smartFetch("/block/tap", {
@@ -32,7 +39,6 @@ class BlockService {
             }
         })
     }
-
 
 
 

@@ -122,6 +122,7 @@ function Profile() {
                                     <div key={block._id} className="Profile__block-card">
 
                                         <ServerImage imgSrc={block.icon} imgClass="Profile__block-image" />
+
                                         <div className="Profile__block-info">
                                             <h3>{block.name}</h3>
                                             <p>Slug: {block.slug}</p>
@@ -132,6 +133,11 @@ function Profile() {
                                                 </span>
                                             )}
                                         </div>
+
+                                        <div
+                                            className={`Profile__block-status ${block.canTap ? "Profile__block-status--active" : ""
+                                                }`}
+                                        />
                                     </div>
                                 ))}
                             </div> : <div className="Profile__blocks-get Profile__blocks-wrapper">
