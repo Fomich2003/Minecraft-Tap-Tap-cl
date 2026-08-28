@@ -40,8 +40,15 @@ class BlockService {
         })
     }
 
-
-
+    async buyBlock(telegramData, slug) {
+        return await smartFetch("/block/buy", {
+            body: JSON.stringify({ telegramData, slug }),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+    }
 }
 
 const blockService = new BlockService()

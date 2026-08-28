@@ -88,6 +88,19 @@ const UserProvider = ({ children }) => {
         return result
     };
 
+    const buyBlock = async (slug) => {
+        if (!telegramData) return { success: false, message: "telegramData is invalid" };
+
+        const result = await blockService.buyBlock(telegramData, slug);
+
+        if (result.block && result.user) {
+            setUser(result.user);
+            setUserBlocks(result.user.tapBlocks);
+        }
+
+        return result;
+    };
+
 
     return (
         <UserContext.Provider value={{

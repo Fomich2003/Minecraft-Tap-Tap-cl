@@ -7,9 +7,10 @@ import ServerImage from "../../components/ServerImage/ServerImage"
 import { FurnaceIcon, ChangeIcon, UpgradeIcon } from "../../utils/icons"
 
 function Tap() {
-    const { user, setUser, userBlocks, sendTapsBlock } = useUserContext()
+    const { buyBlock, setUser, userBlocks, sendTapsBlock } = useUserContext()
     const [count, setCount] = useState(0)
     const [blockBtn, setBlockBtn] = useState(false)
+    const [activeBlock, setActiveBlock] = useState(null)
 
     const [blocksShopList, setBlocksShopList] = useState(null)
     const [blocksShopListLoading, setBlocksShopListLoading] = useState(true)
@@ -35,23 +36,48 @@ function Tap() {
         setBlocksShopListLoading(false)
     }
 
+    const handleActiveBlock = (e, block) => {
+        if (!block.userHas || e.target.className === "Tap__change-item__buy") return
+        setActiveBlock(block)
+        setBlocksShopListOpen(false)
+        localStorage.setItem("activeBlockId", block._id)
+    }
+
     const renderblocksShopList = () => {
         const blocksToShow = blocksShopList.map(block => {
             const userHas = userBlocks.find(usb => usb._id === block._id)
             return { ...block, userHas: userHas ? true : false }
         })
 
-        return blocksToShow.map(block => (
-            <div key={block._id} className="Tap__change-item">
-                <ServerImage imgSrc={block.icon} />
-                <h3>{block.name}</h3>
-                <p><strong>{block.price}</strong></p>
-                {
-                    !block.userHas ? <button>Купити</button> : null
-                }
-            </div>
-        ))
+        return blocksToShow.map(block => {
+            return (
+                <div
+                    key={block._id}
+                    className={`Tap__change-item`}
+                    onClick={(e) => handleActiveBlock(e, block)}
+                >
+                    <ServerImage imgSrc={block.icon} />
+                    <h3>{block.name}</h3>
+                    <p><strong>{block.price}</strong></p>
+                    {
+                        !block.userHas ? <button onClick={() => buyBlock(block.slug)} className="Tap__change-item__buy">Купити</button> : null
+                    }
+                </div>
+            )
+        })
     }
+
+    useEffect(() => {
+        if (!userBlocks || userBlocks.length === 0) return
+
+        const blockIdInLS = localStorage.getItem("activeBlockId")
+
+        const foundedActiveUserBlock = userBlocks.find(b => b._id === blockIdInLS)
+
+        if (!foundedActiveUserBlock || !blockIdInLS) setActiveBlock(userBlocks[0])
+
+        setActiveBlock(foundedActiveUserBlock)
+    }, [])
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -64,16 +90,20 @@ function Tap() {
     }, [count])
 
 
+
+
+
     // onClick={() => sendTapsBlock(userBlocks[0].slug)}>
     return (
         <main id="Tap" className="Tap">
             <div className="Tap__wrapper">
                 <div className="Tap__block">
-                    <button className="Tap__block-btn" onClick={() => incrementCount(1)} disabled={blockBtn}>
-                        <DefaultBlockIcon />
-                        {userBlocks[0].slug}
-                    </button>
-
+                    {
+                        activeBlock ?
+                            <button className="Tap__block-btn" onClick={() => incrementCount(1)} disabled={blockBtn}>
+                                <ServerImage imgSrc={activeBlock.icon} />
+                            </button> : <button className="btn" onClick={openBlocksList}>Pls select block</button>
+                    }
                 </div>
                 <div className="Tap__nav">
                     <button className="Tap__nav-changebtn" onClick={openBlocksList}>

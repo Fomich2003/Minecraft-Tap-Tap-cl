@@ -129,7 +129,7 @@ function Profile() {
 
                                             {block.canTap && (
                                                 <span className="Profile__block-badge">
-                                                    Tap available
+                                                    Tap available   
                                                 </span>
                                             )}
                                         </div>
