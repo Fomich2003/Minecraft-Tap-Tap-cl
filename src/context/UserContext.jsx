@@ -111,7 +111,8 @@ const UserProvider = ({ children }) => {
             setUser,
             handleClaimAward,
             getFirstBlock,
-            sendTapsBlock
+            sendTapsBlock,
+            buyBlock
         }}>
             {children}
         </UserContext.Provider>

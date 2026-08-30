@@ -102,7 +102,7 @@ function Profile() {
                             <div className="Profile__info-stat">
                                 <Logo />
                                 <span>
-                                    {user.inventory.length}
+                                    {/* {user.inventory.length} */}
                                 </span>
                             </div>
                         </div>
