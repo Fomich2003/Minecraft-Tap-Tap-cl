@@ -1,54 +1,52 @@
-import { createContext, useState, useEffect, useContext } from "react";
-import userService from "../services/user.service";
-import blockService from "../services/block.service";
-import { CLIENT_CONF } from "../config/api.config";
-import { data } from "react-router-dom";
+import { createContext, useState, useEffect, useContext } from "react"
+import userService from "../services/user.service"
+import blockService from "../services/block.service"
+import inventoryService from "../services/inventory.service"
+import { CLIENT_CONF } from "../config/api.config"
 
-const UserContext = createContext();
+const UserContext = createContext()
 
 const UserProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(null)
 
-    const [userBlocks, setUserBlocks] = useState([]);
+    const [userBlocks, setUserBlocks] = useState([])
 
-    const [telegramData, setTelegramData] = useState(null);
+    const [telegramData, setTelegramData] = useState(null)
 
-    const [isLoadingUser, setIsLoading] = useState(true);
+    const [isLoadingUser, setIsLoading] = useState(true)
 
+    const [inventory, setInventory] = useState(null)
+
+    const [profileError, setProfileError] = useState(null)
+
+    const loadProfile = async (raw) => {
+        setIsLoading(true)
+        setProfileError(null)
+
+        const data = await userService.getProfile(raw)
+
+        if (data.user) {
+            setUser(data.user)
+            setUserBlocks(data.user.tapBlocks)
+            setInventory(data.inventory)
+        } else {
+            setProfileError(data.message || "Не вдалося завантажити профіль")
+        }
+
+        setIsLoading(false)
+    }
 
     useEffect(() => {
-        if (CLIENT_CONF.mode === "development") {
-            setTelegramData("test")
-            userService.getProfile().then((data) => {
-                setUser(data.user)
-                setUserBlocks(data.user.tapBlocks)
-            })
-            setIsLoading(false)
+        const raw = CLIENT_CONF.mode === "development" ? "test" : window.Telegram?.WebApp?.initData
 
+        if (!raw) {
+            setIsLoading(false)
             return
         }
 
-        if (window?.Telegram?.WebApp) {
-            const tg = window.Telegram.WebApp
-
-            tg.ready()
-
-            const raw = tg.initData
-
-            if (raw) {
-                setTelegramData(raw)
-                userService.getProfile(raw).then((data) => {
-                    setUser(data.user)
-                    setUserBlocks(data.user.tapBlocks)
-                })
-                setIsLoading(false)
-            } else {
-                console.log("initData пустий")
-            }
-        } else {
-            console.log("Telegram WebApp не знайдено")
-        }
-
+        window.Telegram?.WebApp?.ready()
+        setTelegramData(raw)
+        loadProfile(raw)
     }, [])
 
     const handleClaimAward = async () => {
@@ -101,6 +99,12 @@ const UserProvider = ({ children }) => {
         return result;
     };
 
+    const craftItems = async (recipeId, items) => {
+        const result = await inventoryService.craft(telegramData, recipeId, items)
+        if (result.success && result.inventory) setInventory(result.inventory)
+        return result
+    }
+
 
     return (
         <UserContext.Provider value={{
@@ -108,11 +112,15 @@ const UserProvider = ({ children }) => {
             userBlocks,
             telegramData,
             isLoadingUser,
+            profileError,
+            reloadProfile: () => loadProfile(telegramData),
             setUser,
             handleClaimAward,
             getFirstBlock,
             sendTapsBlock,
-            buyBlock
+            buyBlock,
+            inventory,
+            craftItems
         }}>
             {children}
         </UserContext.Provider>

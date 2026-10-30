@@ -29,52 +29,52 @@ function Home() {
                     <h3>Швидкий старт</h3>
 
                     <p>
-                        Почни грати через Telegram за декілька секунд.
+                        Lets play через Telegram for a seconds.
                     </p>
                 </div>
 
                 <div className="card">
                     <div className="icon">💎</div>
 
-                    <h3>Нагороди</h3>
+                    <h3>Awards</h3>
 
                     <p>
-                        Заробляй монети та відкривай нові можливості.
+                        Take coins and open new thing.
                     </p>
                 </div>
 
                 <div className="card">
                     <div className="icon">🛡️</div>
 
-                    <h3>Безпека</h3>
+                    <h3>Security</h3>
 
                     <p>
-                        Авторизація через Telegram та захист акаунта.
+                        Authorization через Telegram and securited account.
                     </p>
                 </div>
             </section>
 
             <section className="steps">
-                <h2>Як почати?</h2>
+                <h2>How to start?</h2>
 
                 <div className="step">
                     <span>1</span>
-                    <h4>Тапай по блоку</h4>
+                    <h4>Tap-tap blocks</h4>
                 </div>
 
                 <div className="step">
                     <span>2</span>
-                    <h4>Збирай випадені предмети</h4>
+                    <h4>Collect doped items</h4>
                 </div>
 
                 <div className="step">
                     <span>3</span>
-                    <h4>Крафть щось на верстаку</h4>
+                    <h4>Craft somthing on craftingtable</h4>
                 </div>
 
 
                 <button className="play__btn" onClick={() => navigate("/game")}>
-                    Почати гру!
+                    Start the game!
                 </button>
             </section>
         </main>

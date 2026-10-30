@@ -1,0 +1,245 @@
+#Inventory {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+
+    .Inventory__wrapper {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        flex-direction: column;
+        gap: clamp(8px, 2dvh, 14px);
+    }
+
+    .Inventory__section-title {
+        margin-bottom: 6px;
+        color: #15372d;
+        font-size: clamp(14px, 3.8vw, 18px);
+        font-weight: 900;
+        letter-spacing: .04em;
+        text-align: center;
+        text-transform: uppercase;
+        text-shadow: 1px 1px 0 rgb(255 255 255 / 55%);
+    }
+
+    .Inventory__craft {
+        display: flex;
+        flex: 0 0 auto;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .Inventory__craft-layout {
+        display: grid;
+        width: min(100%, 440px);
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        align-items: center;
+        justify-items: center;
+        gap: clamp(8px, 3vw, 18px);
+        padding: clamp(8px, 2vw, 12px);
+        border: 3px solid #30251b;
+        background: linear-gradient(135deg, #9a7048, #74502f);
+        box-shadow: inset 3px 3px 0 rgb(255 255 255 / 15%), inset -3px -3px 0 rgb(0 0 0 / 28%), 0 4px 0 #49301f;
+    }
+
+    .Inventory__craft-grid {
+        display: grid;
+        width: 100%;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: clamp(3px, 1vw, 5px);
+    }
+
+    .Inventory__craft-slot,
+    .Inventory__craft-result {
+        position: relative;
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        aspect-ratio: 1;
+        border: 2px solid #292929;
+        background: #777;
+        box-shadow: inset 2px 2px 0 rgb(255 255 255 / 23%), inset -2px -2px 0 rgb(0 0 0 / 24%);
+    }
+
+    .Inventory__craft-result--ready {
+        background: #b4a16b;
+        outline: 2px solid #fcae00;
+        box-shadow: 0 0 12px rgb(252 174 0 / 55%), inset 3px 3px 0 rgb(255 255 255 / 25%), inset -3px -3px 0 rgb(0 0 0 / 28%);
+        cursor: pointer;
+
+        &:hover:not(:disabled) {
+            filter: brightness(1.12);
+            transform: scale(1.04);
+        }
+    }
+
+    .Inventory__craft-result:disabled { cursor: default; }
+
+    .Inventory__craft-result-count {
+        position: absolute;
+        right: 3px;
+        bottom: 2px;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1;
+        text-shadow: 1px 1px 2px #111, -1px -1px 2px #111;
+        pointer-events: none;
+    }
+
+    .Inventory__craft-message {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+    }
+
+    .Inventory__craft-slot--target {
+        background: #a58c50;
+        outline: 2px solid #fcae00;
+        transform: scale(1.06);
+    }
+
+    .Inventory__craft-item {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: grab;
+        touch-action: none;
+    }
+
+    .Inventory__craft-arrow {
+        color: #f1e4c7;
+        font-size: clamp(22px, 6vw, 32px);
+        font-weight: 900;
+        text-shadow: 2px 2px #352619;
+    }
+
+    .Inventory__craft-result {
+        width: 100%;
+        max-width: none;
+        border-width: 3px;
+        background: #8b8b8b;
+        box-shadow: inset 3px 3px 0 rgb(255 255 255 / 25%), inset -3px -3px 0 rgb(0 0 0 / 28%), 0 0 0 2px #55412c;
+        padding: 0;
+        border-radius: 0;
+        color: inherit;
+        cursor: default;
+    }
+
+    .Inventory__craft-result--ready {
+        background: #b4a16b;
+        outline: 2px solid #fcae00;
+        box-shadow: 0 0 12px rgb(252 174 0 / 55%), inset 3px 3px 0 rgb(255 255 255 / 25%), inset -3px -3px 0 rgb(0 0 0 / 28%);
+        cursor: pointer;
+
+        &:hover:not(:disabled) {
+            filter: brightness(1.12);
+            transform: scale(1.04);
+        }
+    }
+
+    .Inventory__craft-result:disabled { cursor: default; }
+
+    .Inventory__craft-result-count {
+        position: absolute;
+        right: 3px;
+        bottom: 2px;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1;
+        text-shadow: 1px 1px 2px #111, -1px -1px 2px #111;
+        pointer-events: none;
+    }
+
+    .Inventory__items {
+        display: flex;
+        min-height: 0;
+        flex: 1 1 0;
+        flex-direction: column;
+        padding-top: clamp(4px, 1.5dvh, 10px);
+    }
+
+    .Inventory__grid {
+        display: grid;
+        width: 100%;
+        min-height: 0;
+        grid-auto-rows: max-content;
+        gap: clamp(3px, 1vw, 5px);
+        overflow-x: hidden;
+        overflow-y: auto;
+        padding: clamp(5px, 1.5vw, 8px);
+        border: 1px solid var(--accent);
+        border-radius: 10px;
+        background: var(--accent);
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: #739487 var(--accent);
+    }
+
+    .Inventory__slot {
+        position: relative;
+        display: flex;
+        min-width: 0;
+        aspect-ratio: 1;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgb(1 71 53 / 35%);
+        border-radius: 4px;
+        background: #8b8b8b;
+        box-shadow: inset 2px 2px 0 rgb(255 255 255 / 24%), inset -2px -2px 0 rgb(0 0 0 / 18%);
+        transition: background-color 120ms ease, transform 120ms ease;
+
+        &--target {
+            background: #686868;
+            transform: scale(1.04);
+        }
+    }
+
+    .Inventory__item {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: grab;
+        touch-action: none;
+
+        &:active { cursor: grabbing; }
+    }
+
+    .Inventory__image {
+        width: 76%;
+        height: 76%;
+        object-fit: contain;
+        image-rendering: pixelated;
+        pointer-events: none;
+        user-select: none;
+    }
+
+    .Inventory__count {
+        position: absolute;
+        right: 3px;
+        bottom: 2px;
+        color: #fff;
+        font-size: clamp(10px, 3vw, 13px);
+        font-weight: 700;
+        line-height: 1;
+        text-shadow: 1px 1px 2px #111, -1px -1px 2px #111;
+        pointer-events: none;
+    }
+}
+
+@media (max-height: 650px) {
+    #Inventory .Inventory__wrapper { gap: 5px; }
+    #Inventory .Inventory__craft-layout { width: min(100%, 360px); padding: 6px; }
+    #Inventory .Inventory__section-title { margin-bottom: 3px; font-size: 13px; }
+}

@@ -1,463 +1,397 @@
-    .Tap {
+#Tap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    color: var(--text);
+
+    .Tap__wrapper {
+        display: flex;
         width: 100%;
-        color: #16352d;
-        position: relative;
-
-
-        &__wrapper {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            gap: 18px;
-
-        }
-
-        // =========================
-        // MAIN BLOCK
-        // =========================
-
-        &__block {
-            width: 80%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: auto 0;
-
-            &-btn {
-                width: 100%;
-                aspect-ratio: 1/1;
-                border: 0;
-                border-radius: 28px;
-                background:
-                    linear-gradient(145deg,
-                        rgba(255, 255, 255, 0.96),
-                        rgba(239, 247, 250, 0.96));
-
-                box-shadow:
-                    0 18px 40px rgba(0, 70, 55, 0.12),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.9);
-
-                color: #173b31;
-
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 18px;
-
-                font-size: 24px;
-                font-weight: 800;
-                letter-spacing: 0.3px;
-
-                cursor: pointer;
-                user-select: none;
-                -webkit-tap-highlight-color: transparent;
-
-                transition:
-                    transform 0.12s ease,
-                    box-shadow 0.12s ease,
-                    background 0.2s ease;
-
-                svg {
-                    width: 155px;
-                    height: 155px;
-
-                    filter:
-                        drop-shadow(0 12px 12px rgba(0, 0, 0, 0.14));
-
-                    transition: transform 0.12s ease;
-                }
-
-                &:hover {
-                    box-shadow:
-                        0 22px 48px rgba(0, 70, 55, 0.16),
-                        inset 0 1px 0 rgba(255, 255, 255, 1);
-
-                    transform: translateY(-2px);
-                }
-
-                &:active {
-                    transform: scale(0.96);
-
-                    box-shadow:
-                        0 8px 20px rgba(0, 70, 55, 0.12),
-                        inset 0 3px 8px rgba(0, 0, 0, 0.06);
-
-                    svg {
-                        transform: scale(0.92);
-                    }
-                }
-
-                &:disabled {
-                    cursor: default;
-                    opacity: 0.92;
-                }
-            }
-        }
-
-
-        // =========================
-        // NAVIGATION
-        // =========================
-
-        &__nav {
-            width: 100%;
-
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-
-            button {
-                min-height: 48px;
-                width: fit-content;
-                padding: 0;
-
-                border: 0;
-                border-radius: 14px;
-
-                background: none;
-
-                color: #175344;
-
-                font-size: 14px;
-                font-weight: 800;
-
-
-
-                cursor: pointer;
-                transition:
-                    transform 0.15s ease,
-                    background 0.15s ease,
-                    color 0.15s ease,
-                    box-shadow 0.15s ease;
-
-                &:hover {
-
-                    transform: translateY(-2px);
-                    box-shadow:
-                        0 8px 18px rgba(0, 70, 55, 0.12);
-                }
-
-                &:active {
-                    transform: scale(0.96);
-                }
-
-                svg {
-                    width: 48px;
-                    height: 48px;
-                }
-            }
-        }
-
-
-        &__change {
-            position: fixed;
-            inset: 0;
-            z-index: 999;
-
-            display: flex;
-            align-items: flex-end;
-
-            pointer-events: none;
-            background: rgba(1, 71, 53, 0);
-
-            transition:
-                background 0.35s ease,
-                backdrop-filter 0.35s ease;
-
-            // =========================
-            // WRAPPER
-            // =========================
-
-            &-wrapper {
-                position: relative;
-
-                width: 100%;
-                height: 0;
-                max-height: 80dvh;
-
-                padding: 0;
-
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-
-                overflow: hidden;
-
-                background: var(--bg);
-                border-radius: 24px 24px 0 0;
-
-                box-shadow:
-                    0 -12px 40px rgba(1, 71, 53, 0.18),
-                    0 -2px 10px rgba(1, 71, 53, 0.08);
-
-                transform: translateY(100%);
-
-                transition:
-                    height 0.35s ease,
-                    padding 0.35s ease,
-                    transform 0.35s ease;
-
-                // Верхня ручка
-                &::before {
-                    content: "";
-
-                    position: absolute;
-                    top: 10px;
-                    left: 50%;
-
-                    width: 44px;
-                    height: 5px;
-
-                    border-radius: 999px;
-
-                    background: var(--accent);
-                    opacity: 0.35;
-
-                    transform: translateX(-50%);
-                }
-
-                &--opened {
-                    height: 80dvh;
-
-                    padding: 28px 16px 20px;
-
-                    transform: translateY(0);
-
-                    overflow-y: auto;
-                    pointer-events: auto;
-
-                    scrollbar-width: thin;
-                    scrollbar-color: var(--accent) transparent;
-
-                    &::-webkit-scrollbar {
-                        width: 5px;
-                    }
-
-                    &::-webkit-scrollbar-track {
-                        background: transparent;
-                    }
-
-                    &::-webkit-scrollbar-thumb {
-                        background: var(--accent);
-                        border-radius: 999px;
-                    }
-                }
-            }
-
-
-            // =========================
-            // BLOCK ITEM
-            // =========================
-
-            &-item {
-                width: 100%;
-                min-height: 76px;
-
-                box-sizing: border-box;
-
-                display: flex;
-                align-items: center;
-                gap: 12px;
-
-                padding: 10px 12px;
-
-                background: var(--white);
-
-                border: 2px solid transparent;
-                border-radius: 18px;
-
-                box-shadow:
-                    0 5px 16px rgba(1, 71, 53, 0.08);
-
-                transition:
-                    transform 0.15s ease,
-                    border-color 0.15s ease,
-                    box-shadow 0.15s ease;
-
-                &:hover {
-                    transform: translateY(-2px);
-
-                    border-color: rgba(1, 71, 53, 0.12);
-
-                    box-shadow:
-                        0 9px 22px rgba(1, 71, 53, 0.12);
-                }
-
-                // =========================
-                // ICON
-                // =========================
-
-                img {
-                    width: 52px;
-                    height: 52px;
-
-                    flex-shrink: 0;
-
-                    object-fit: contain;
-
-                    border-radius: 12px;
-                }
-
-                // =========================
-                // NAME
-                // =========================
-
-                h3 {
-                    flex: 1;
-
-                    margin: 0;
-
-                    color: var(--text);
-
-                    font-size: 17px;
-                    font-weight: 800;
-                    line-height: 1.15;
-                }
-
-                // =========================
-                // PRICE
-                // =========================
-
-                p {
-                    margin: 0;
-
-                    color: var(--accent);
-
-                    font-size: 15px;
-                    font-weight: 700;
-
-                    strong {
-                        display: inline-flex;
-                        align-items: center;
-
-                        min-width: 55px;
-                        justify-content: center;
-
-                        padding: 7px 9px;
-
-                        background: rgba(252, 174, 0, 0.15);
-
-                        border-radius: 10px;
-
-                        color: var(--text);
-                    }
-                }
-
-                // =========================
-                // BUY BUTTON
-                // =========================
-
-                button {
-                    min-width: 76px;
-                    height: 40px;
-
-                    padding: 0 12px;
-
-                    border: 0;
-                    border-radius: 12px;
-
-                    background: var(--accent);
-                    color: var(--white);
-
-                    font-family: inherit;
-                    font-size: 14px;
-                    font-weight: 800;
-
-                    cursor: pointer;
-
-                    transition:
-                        transform 0.15s ease,
-                        background 0.15s ease,
-                        box-shadow 0.15s ease;
-
-                    &:hover {
-                        background: var(--neon);
-
-                        box-shadow:
-                            0 6px 14px rgba(64, 203, 4, 0.25);
-
-                        transform: translateY(-1px);
-                    }
-
-                    &:active {
-                        transform: scale(0.95);
-                    }
-                }
-            }
-
-
-            // =========================
-            // CLOSE BUTTON
-            // =========================
-
-            &-close {
-                position: absolute;
-
-                top: 16px;
-                right: 8px;
-
-                z-index: 10;
-
-                width: 40px;
-                height: 40px;
-
-                display: flex;
-                align-items: center;
-                justify-content: center;
-
-                padding: 0;
-
-
-
-                border: 0;
-                border-radius: 20px;
-
-                background: var(--white);
-                color: var(--accent);
-
-                font-family: inherit;
-                font-size: 20px;
-                font-weight: 900;
-
-                cursor: pointer;
-
-                box-shadow:
-                    0 5px 14px rgba(1, 71, 53, 0.10);
-
-                transition:
-                    transform 0.15s ease,
-                    background 0.15s ease,
-                    color 0.15s ease;
-
-                &:hover {
-                    background: var(--secondary);
-                    color: var(--text);
-
-                    transform: rotate(90deg);
-                }
-
-                &:active {
-                    transform: rotate(90deg) scale(0.9);
-                }
-            }
-
-
-            // =========================
-            // BACKDROP
-            // =========================
-
-            &:has(&-wrapper--opened) {
-                pointer-events: auto;
-
-                background: rgba(1, 71, 53, 0.25);
-
-                backdrop-filter: blur(5px);
-                -webkit-backdrop-filter: blur(5px);
-            }
-        }
-
-
+        height: 100%;
+        min-height: 0;
+        flex-direction: column;
+        align-items: center;
     }
+
+    .Tap__block {
+        display: flex;
+        width: 100%;
+        min-height: 0;
+        flex: 1;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 0;
+    }
+
+    .Tap__block-btn {
+        position: relative;
+        display: grid;
+        width: min(100%, 340px, calc(100svh - var(--header-height) - var(--navbar-height) - 150px));
+        max-height: 100%;
+        aspect-ratio: 1;
+        place-items: center;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        overflow: visible;
+        transition: transform 100ms ease;
+
+        &::after {
+            position: absolute;
+            z-index: 0;
+            inset: 18%;
+            border-radius: 50%;
+            background: rgb(252 174 0 / 0%);
+            content: "";
+            pointer-events: none;
+        }
+
+        .Tap__block-art {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            width: 58%;
+            height: 58%;
+            place-items: center;
+            transform-origin: 50% 65%;
+            pointer-events: none;
+        }
+
+        .Tap__block-art > .ServerImage {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 12px 12px rgb(0 0 0 / 18%));
+        }
+
+        &:hover {
+            transform: translateY(-3px);
+        }
+
+        &:active {
+            transform: scale(0.96);
+        }
+
+        &:focus-visible {
+            outline: 3px solid var(--secondary);
+            outline-offset: 4px;
+        }
+    }
+
+    .Tap__tap-effects {
+        position: absolute;
+        z-index: 5;
+        inset: 0;
+        overflow: visible;
+        pointer-events: none;
+    }
+
+    .Tap__tap-number {
+        position: absolute;
+        top: var(--tap-y);
+        left: var(--tap-x);
+        color: #fff;
+        font-size: clamp(24px, 7vw, 34px);
+        font-weight: 1000;
+        line-height: 1;
+        text-shadow: 0 2px 0 #874b00, 0 4px 10px rgb(0 0 0 / 45%);
+        pointer-events: none;
+        animation: tap-number-float 850ms cubic-bezier(.16,.7,.25,1) both;
+        --tap-drift: 0px;
+    }
+
+    @keyframes tap-number-float {
+        0% { opacity: 0; transform: translate(-50%, -20%) scale(.55) rotate(-8deg); }
+        16% { opacity: 1; transform: translate(-50%, -65%) scale(1.2) rotate(4deg); }
+        100% { opacity: 0; transform: translate(calc(-50% + var(--tap-drift)), -210%) scale(.9) rotate(-7deg); }
+    }
+
+    .Tap__nav {
+        display: flex;
+        width: 100%;
+        flex: 0 0 auto;
+        justify-content: center;
+        gap: 14px;
+        padding: 10px 0 18px;
+    }
+
+    .Tap__nav {
+        padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+
+    .Tap__nav button {
+        display: grid;
+        width: 58px;
+        height: 54px;
+        flex: 0 0 58px;
+        place-items: center;
+        border: 1.5px solid rgb(1 71 53 / 35%);
+        border-radius: 17px;
+        background: linear-gradient(180deg, #fff, #f1f8f7);
+        color: var(--accent);
+        box-shadow: 0 4px 10px rgb(1 71 53 / 10%), inset 0 1px 0 #fff;
+        cursor: pointer;
+        transition: transform 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+
+        svg {
+            width: 34px;
+            height: 34px;
+        }
+
+        &:hover {
+            transform: translateY(-2px);
+            background: #fff;
+            box-shadow: 0 7px 15px rgb(1 71 53 / 15%);
+        }
+
+        &:active {
+            transform: scale(0.95);
+        }
+
+        &:focus-visible {
+            outline: 3px solid var(--secondary);
+            outline-offset: 3px;
+        }
+    }
+
+    .Tap__change {
+        position: fixed;
+        z-index: 999;
+        inset: var(--header-height) 0 var(--navbar-height);
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        pointer-events: none;
+        background: transparent;
+        transition: background-color 220ms ease, backdrop-filter 220ms ease;
+
+        &--opened {
+            pointer-events: auto;
+            background: rgb(4 30 25 / 30%);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+        }
+    }
+
+    .Tap__change-backdrop {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        border: 0;
+        background: transparent;
+        opacity: 0;
+    }
+
+    .Tap__change--opened .Tap__change-backdrop {
+        opacity: 1;
+    }
+
+    .Tap__change-wrapper {
+        position: relative;
+        display: flex;
+        width: min(100%, var(--max-content-width));
+        height: min(58dvh, 460px);
+        max-height: calc(100dvh - var(--header-height) - var(--navbar-height));
+        flex-direction: column;
+        gap: 12px;
+        overflow: hidden;
+        padding: 0 16px;
+        border: 1px solid rgb(1 71 53 / 18%);
+        border-bottom: 0;
+        border-radius: 26px 26px 0 0;
+        background: linear-gradient(180deg, #f8fdff 0%, #e6f5fa 100%);
+        box-shadow: 0 -14px 38px rgb(0 40 35 / 22%), inset 0 1px 0 #fff;
+        transform: translateY(105%);
+        visibility: hidden;
+        transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1), padding 260ms ease, visibility 260ms;
+
+        &::before {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            width: 42px;
+            height: 5px;
+            border-radius: 999px;
+            background: rgb(1 71 53 / 28%);
+            content: "";
+            transform: translateX(-50%);
+        }
+    }
+
+    .Tap__change-wrapper--opened {
+        padding: 30px 16px 0;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .Tap__change-list {
+        display: grid;
+        min-height: 0;
+        flex: 1;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-rows: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        align-content: stretch;
+    }
+
+    .Tap__change-item {
+        display: flex;
+        min-width: 0;
+        min-height: 0;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 8px;
+        border: 1px solid rgb(1 71 53 / 12%);
+        border-radius: 18px;
+        background: rgb(255 255 255 / 92%);
+        box-shadow: 0 5px 15px rgb(1 71 53 / 8%), inset 0 1px 0 #fff;
+        cursor: pointer;
+        transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+
+        &--active {
+            border: 2px solid #fcae00;
+            background: linear-gradient(145deg, #fff8d9, #fff 75%);
+            box-shadow: 0 0 0 3px rgb(252 174 0 / 34%), 0 8px 22px rgb(112 71 0 / 23%), inset 0 0 0 1px #fff;
+            transform: translateY(-2px);
+        }
+
+        &:hover {
+            transform: translateY(-2px);
+            border-color: rgb(1 71 53 / 30%);
+            box-shadow: 0 9px 20px rgb(1 71 53 / 13%);
+        }
+
+        img {
+            width: clamp(32px, 9vw, 54px);
+            height: clamp(32px, 9vw, 54px);
+            object-fit: contain;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 5px 6px rgb(0 0 0 / 14%));
+        }
+
+        h3 {
+            width: 100%;
+            overflow: hidden;
+            color: #173f35;
+            font-size: clamp(11px, 3vw, 14px);
+            font-weight: 800;
+            text-align: center;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        p {
+            color: #9b6b00;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .Tap__change-item__buy {
+            width: 100%;
+            min-height: 30px;
+            margin-top: auto;
+            border: 1px solid rgb(1 71 53 / 18%);
+            border-radius: 9px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background-color 140ms ease, transform 140ms ease;
+
+            &:hover {
+                background: #08745d;
+            }
+
+            &:active {
+                transform: scale(0.96);
+            }
+        }
+    }
+
+    .Tap__change-owned {
+        margin-top: auto;
+        color: var(--accent);
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .Tap__change-close {
+        position: absolute;
+        z-index: 2;
+        top: 15px;
+        right: 16px;
+        display: grid;
+        width: 36px;
+        height: 36px;
+        place-items: center;
+        border: 1px solid rgb(1 71 53 / 15%);
+        border-radius: 50%;
+        background: #fff;
+        color: var(--accent);
+        font-size: 22px;
+        font-weight: 500;
+        cursor: pointer;
+        box-shadow: 0 3px 10px rgb(1 71 53 / 10%);
+        transition: transform 140ms ease, background-color 140ms ease;
+
+        &:hover {
+            transform: rotate(90deg);
+            background: #f3fbf8;
+        }
+    }
+
+}
+
+@media (max-width: 380px) {
+    #Tap {
+        .Tap__nav {
+            gap: 10px;
+        }
+
+        .Tap__nav button {
+            width: 52px;
+            height: 50px;
+            flex-basis: 52px;
+        }
+
+        .Tap__change-wrapper {
+            height: min(58dvh, 400px);
+            padding-right: 10px;
+            padding-left: 10px;
+        }
+
+        .Tap__change-wrapper--opened {
+            padding-right: 10px;
+            padding-left: 10px;
+        }
+
+        .Tap__change-list {
+            gap: 7px;
+        }
+
+        .Tap__change-item {
+            gap: 3px;
+            padding: 6px 4px;
+            border-radius: 14px;
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #Tap,
+    #Tap * {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
