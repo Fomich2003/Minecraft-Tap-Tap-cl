@@ -2,33 +2,45 @@ import { createContext, useState, useEffect, useContext } from "react"
 import userService from "../services/user.service"
 import blockService from "../services/block.service"
 import inventoryService from "../services/inventory.service"
+import stationService from "../services/station.service"
 import { CLIENT_CONF } from "../config/api.config"
 
 const UserContext = createContext()
+
+const readInitData = () => (CLIENT_CONF.mode === "development" ? "test" : window.Telegram?.WebApp?.initData) || null
 
 const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null)
 
     const [userBlocks, setUserBlocks] = useState([])
 
-    const [telegramData, setTelegramData] = useState(null)
+    const [telegramData] = useState(readInitData)
 
-    const [isLoadingUser, setIsLoading] = useState(true)
+    const [isLoadingUser, setIsLoading] = useState(Boolean(telegramData))
 
     const [inventory, setInventory] = useState(null)
 
     const [profileError, setProfileError] = useState(null)
 
-    const loadProfile = async (raw) => {
-        setIsLoading(true)
-        setProfileError(null)
+    const [catalog, setCatalog] = useState(null)
 
-        const data = await userService.getProfile(raw)
+    const [stations, setStations] = useState([])
+
+    const loadProfile = async (raw) => {
+        const [data, catalogData, stationData] = await Promise.all([
+            userService.getProfile(raw),
+            inventoryService.getCatalog(),
+            stationService.list(raw),
+        ])
 
         if (data.user) {
             setUser(data.user)
             setUserBlocks(data.user.tapBlocks)
             setInventory(data.inventory)
+            if (catalogData.success) setCatalog(catalogData)
+            // Новий користувач створюється запитом профілю, тому верстаки читаються після нього
+            const stationList = stationData.success ? stationData : await stationService.list(raw)
+            if (stationList.success) setStations(stationList.stations)
         } else {
             setProfileError(data.message || "Не вдалося завантажити профіль")
         }
@@ -36,18 +48,26 @@ const UserProvider = ({ children }) => {
         setIsLoading(false)
     }
 
+    const retryProfile = () => {
+        setIsLoading(true)
+        setProfileError(null)
+        loadProfile(telegramData)
+    }
+
     useEffect(() => {
-        const raw = CLIENT_CONF.mode === "development" ? "test" : window.Telegram?.WebApp?.initData
-
-        if (!raw) {
-            setIsLoading(false)
-            return
-        }
-
+        if (!telegramData) return
         window.Telegram?.WebApp?.ready()
-        setTelegramData(raw)
-        loadProfile(raw)
-    }, [])
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- результат запиту до сервера
+        loadProfile(telegramData)
+    }, [telegramData])
+
+    // Відповіді сервера повертають змінені інвентар і баланс
+    const applyResult = result => {
+        if (result.inventory) setInventory(result.inventory)
+        if (typeof result.balance === "number") setUser(prev => ({ ...prev, balance: result.balance }))
+        if (result.stations) setStations(result.stations)
+        return result
+    }
 
     const handleClaimAward = async () => {
         if (!telegramData) return { success: false, message: "telegramData is invalid" }
@@ -79,10 +99,7 @@ const UserProvider = ({ children }) => {
         if (!telegramData) return { success: false, message: "telegramData is invalid" }
 
         const result = await blockService.sendTapsBlock(telegramData, slug, count)
-        if (result.user) setUser(prev => ({
-            ...prev,
-            balance: result.user.balance
-        }))
+        if (result.inventory) setInventory(result.inventory)
         return result
     };
 
@@ -99,11 +116,13 @@ const UserProvider = ({ children }) => {
         return result;
     };
 
-    const craftItems = async (recipeId, items) => {
-        const result = await inventoryService.craft(telegramData, recipeId, items)
-        if (result.success && result.inventory) setInventory(result.inventory)
-        return result
-    }
+    const buyItem = async (slug, quantity) => applyResult(await inventoryService.buy(telegramData, slug, quantity))
+
+    const sellStack = async (stackId, quantity) => applyResult(await inventoryService.sell(telegramData, stackId, quantity))
+
+    const buyStation = async slug => applyResult(await stationService.buy(telegramData, slug))
+
+    const activateStation = async slug => applyResult(await stationService.activate(telegramData, slug))
 
 
     return (
@@ -113,14 +132,20 @@ const UserProvider = ({ children }) => {
             telegramData,
             isLoadingUser,
             profileError,
-            reloadProfile: () => loadProfile(telegramData),
+            reloadProfile: retryProfile,
             setUser,
             handleClaimAward,
             getFirstBlock,
             sendTapsBlock,
             buyBlock,
             inventory,
-            craftItems
+            catalog,
+            stations,
+            applyResult,
+            buyItem,
+            sellStack,
+            buyStation,
+            activateStation
         }}>
             {children}
         </UserContext.Provider>

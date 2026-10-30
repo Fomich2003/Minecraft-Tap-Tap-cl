@@ -11,17 +11,21 @@ class InventoryService {
         })
     }
 
-    async getWorkbenchRecipes(telegramData) {
-        return await smartFetch("/inventory/workbench", {
-            body: JSON.stringify({ telegramData }),
+    async getCatalog() {
+        return await smartFetch("/inventory/catalog")
+    }
+
+    async buy(telegramData, slug, quantity) {
+        return await smartFetch("/inventory/buy", {
+            body: JSON.stringify({ telegramData, slug, quantity }),
             method: "POST",
             headers: { "Content-Type": "application/json" }
         })
     }
 
-    async craft(telegramData, recipeId, items) {
-        return await smartFetch("/inventory/craft", {
-            body: JSON.stringify({ telegramData, recipeId, items }),
+    async sell(telegramData, stackId, quantity) {
+        return await smartFetch("/inventory/sell", {
+            body: JSON.stringify({ telegramData, stackId, quantity }),
             method: "POST",
             headers: { "Content-Type": "application/json" }
         })

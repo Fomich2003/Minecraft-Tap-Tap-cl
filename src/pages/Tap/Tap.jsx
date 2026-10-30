@@ -3,24 +3,36 @@ import { useUserContext } from "../../context/UserContext"
 import { useState, useEffect, useRef } from "react"
 import blockService from "../../services/block.service"
 import ServerImage from "../../components/ServerImage/ServerImage"
+import BottomSheet from "../../components/BottomSheet/BottomSheet"
 import { FurnaceIcon, ChangeIcon, UpgradeIcon } from "../../utils/icons"
 
+const FLUSH_DELAY_MS = 1000
+const MAX_FLUSH_INTERVAL_MS = 3000
+
 function Tap() {
-    const { buyBlock, setUser, userBlocks, sendTapsBlock } = useUserContext()
-    const [count, setCount] = useState(0)
-    const [blockBtn, setBlockBtn] = useState(false)
+    const { user, buyBlock, setUser, userBlocks, sendTapsBlock, catalog } = useUserContext()
     const [activeBlock, setActiveBlock] = useState(null)
     const [tapEffects, setTapEffects] = useState([])
+    const [dropEffects, setDropEffects] = useState([])
+    const [shopMessage, setShopMessage] = useState("")
     const nextEffectId = useRef(0)
     const effectTimers = useRef(new Set())
     const pendingTaps = useRef(0)
     const flushTimer = useRef(null)
+    const lastFlush = useRef(0)
+    const isFlushing = useRef(false)
     const activeBlockRef = useRef(null)
     activeBlockRef.current = activeBlock
 
     const [blocksShopList, setBlocksShopList] = useState(null)
     const [blocksShopListLoading, setBlocksShopListLoading] = useState(false)
     const [blocksShopListOpen, setBlocksShopListOpen] = useState(false)
+
+    const scheduleFlush = () => {
+        clearTimeout(flushTimer.current)
+        const sinceFlush = Date.now() - lastFlush.current
+        flushTimer.current = setTimeout(flushTaps, sinceFlush >= MAX_FLUSH_INTERVAL_MS ? 0 : FLUSH_DELAY_MS)
+    }
 
     const incrementCount = (num, event) => {
         const bounds = event.currentTarget.getBoundingClientRect()
@@ -39,9 +51,7 @@ function Tap() {
         }, 900)
         effectTimers.current.add(effectTimer)
         pendingTaps.current += num
-        setCount(pendingTaps.current)
-        clearTimeout(flushTimer.current)
-        flushTimer.current = setTimeout(flushTaps, 1000)
+        scheduleFlush()
 
         setUser(prev => ({
             ...prev,
@@ -62,7 +72,7 @@ function Tap() {
         try {
             const req = await blockService.getBlocksToTap()
             if (req.success) setBlocksShopList(req.blocks)
-        } catch (error) {
+        } catch {
             setBlocksShopList([])
         } finally {
             setBlocksShopListLoading(false)
@@ -70,10 +80,16 @@ function Tap() {
     }
 
     const handleActiveBlock = (e, block) => {
-        if (!block.userHas || e.target.closest(".Tap__change-item__buy")) return
+        if (!block.userHas || e.target.closest(".BottomSheet__buy")) return
         setActiveBlock(block)
         setBlocksShopListOpen(false)
         localStorage.setItem("activeBlockId", block._id)
+    }
+
+    const handleBuy = async (e, block) => {
+        e.stopPropagation()
+        const result = await buyBlock(block.slug)
+        setShopMessage(result.success ? "" : result.message)
     }
 
     const renderblocksShopList = () => {
@@ -87,41 +103,66 @@ function Tap() {
             return (
                 <div
                     key={block._id}
-                    className={`Tap__change-item${isActive ? " Tap__change-item--active" : ""}`}
+                    className={`BottomSheet__item${isActive ? " BottomSheet__item--active" : ""}`}
                     aria-current={isActive ? "true" : undefined}
                     onClick={(e) => handleActiveBlock(e, block)}
                 >
-                    <ServerImage imgSrc={block.icon} imgClass="Tap__change-image" />
+                    <ServerImage imgSrc={block.icon} alt={block.name} />
                     <h3>{block.name}</h3>
                     <p><strong>{block.price}</strong></p>
                     {
-                        !block.userHas ? <button onClick={(e) => { e.stopPropagation(); buyBlock(block.slug) }} className="Tap__change-item__buy">Купити</button> : <span className="Tap__change-owned">{isActive ? "Активний блок" : "Є у вас"}</span>
+                        !block.userHas
+                            ? <button onClick={(e) => handleBuy(e, block)} disabled={user.balance < block.price} className="BottomSheet__buy">{user.balance < block.price ? "Бракує монет" : "Купити"}</button>
+                            : <span className="BottomSheet__owned">{isActive ? "Активний блок" : "Є у вас"}</span>
                     }
                 </div>
             )
         })
     }
 
+    const showDrops = drops => {
+        const effects = drops.slice(0, 5).map(slug => ({ id: nextEffectId.current++, item: catalog?.items.find(item => item.slug === slug) }))
+        setDropEffects(previous => [...previous, ...effects].slice(-5))
+        const ids = new Set(effects.map(effect => effect.id))
+        const timer = setTimeout(() => {
+            setDropEffects(previous => previous.filter(effect => !ids.has(effect.id)))
+            effectTimers.current.delete(timer)
+        }, 1400)
+        effectTimers.current.add(timer)
+    }
+
     async function flushTaps() {
-        if (!pendingTaps.current || !activeBlockRef.current) return
+        if (!pendingTaps.current || !activeBlockRef.current || isFlushing.current) return
 
         const tapsToSend = pendingTaps.current
         const blockSlug = activeBlockRef.current.slug
         pendingTaps.current = 0
-        setCount(0)
+        isFlushing.current = true
+        lastFlush.current = Date.now()
 
         const result = await sendTapsBlock(blockSlug, tapsToSend)
+        isFlushing.current = false
+
         if (!result.success) {
             pendingTaps.current += tapsToSend
-            setCount(pendingTaps.current)
+            scheduleFlush()
+            return
         }
+
+        // Сервер міг прийняти менше тапів: показуємо його баланс разом із ще не надісланими
+        setUser(prev => ({ ...prev, balance: result.user.balance + pendingTaps.current }))
+        if (result.drops?.length) showDrops(result.drops)
+        if (pendingTaps.current) scheduleFlush()
     }
 
-    useEffect(() => () => {
-        effectTimers.current.forEach(clearTimeout)
-        clearTimeout(flushTimer.current)
-        if (pendingTaps.current && activeBlockRef.current) {
-            sendTapsBlock(activeBlockRef.current.slug, pendingTaps.current)
+    useEffect(() => {
+        const timers = effectTimers.current
+        return () => {
+            timers.forEach(clearTimeout)
+            clearTimeout(flushTimer.current)
+            if (pendingTaps.current && activeBlockRef.current) {
+                sendTapsBlock(activeBlockRef.current.slug, pendingTaps.current)
+            }
         }
     }, [])
 
@@ -135,15 +176,14 @@ function Tap() {
         setActiveBlock(foundedActiveUserBlock || userBlocks[0])
     }, [])
 
-    // onClick={() => sendTapsBlock(userBlocks[0].slug)}>
     return (
         <main id="Tap" className="Tap">
             <div className="Tap__wrapper">
                 <div className="Tap__block">
                     {activeBlock ? (
-                        <button className="Tap__block-btn" onClick={(event) => incrementCount(1, event)} disabled={blockBtn}>
+                        <button className="Tap__block-btn" onClick={(event) => incrementCount(1, event)}>
                             <span className="Tap__block-art" key={activeBlock._id || activeBlock.slug}>
-                                <ServerImage imgSrc={activeBlock.icon} />
+                                <ServerImage imgSrc={activeBlock.icon} alt={activeBlock.name} />
                             </span>
                         </button>
                     ) : (
@@ -161,6 +201,13 @@ function Tap() {
                         </span>
                     ))}
                 </div>
+                <div className="Tap__drops" aria-live="polite">
+                    {dropEffects.map(effect => effect.item && (
+                        <span key={effect.id} className="Tap__drop">
+                            <ServerImage imgSrc={effect.item.icon} alt={effect.item.name} />
+                        </span>
+                    ))}
+                </div>
                 <div className="Tap__nav">
                     <button className="Tap__nav-changebtn" onClick={openBlocksList} aria-label="Змінити блок" aria-expanded={blocksShopListOpen}>
                         <ChangeIcon />
@@ -174,15 +221,12 @@ function Tap() {
                 </div>
             </div>
 
-            <div className={`Tap__change ${blocksShopListOpen ? "Tap__change--opened" : ""}`}>
-                <button className="Tap__change-backdrop" onClick={() => setBlocksShopListOpen(false)} aria-label="Закрити вибір блока" />
-                <div className={`Tap__change-wrapper ${blocksShopListOpen ? "Tap__change-wrapper--opened" : ""}`}>
-                    <button onClick={() => setBlocksShopListOpen(false)} className="Tap__change-close" aria-label="Закрити">×</button>
-                    <div className="Tap__change-list">
-                        {blocksShopListLoading ? "Завантаження…" : blocksShopList ? renderblocksShopList() : "Не вдалося завантажити блоки"}
-                    </div>
+            <BottomSheet open={blocksShopListOpen} onClose={() => setBlocksShopListOpen(false)} label="Вибір блока">
+                {shopMessage && <p className="BottomSheet__message">{shopMessage}</p>}
+                <div className="BottomSheet__list">
+                    {blocksShopListLoading ? "Завантаження…" : blocksShopList ? renderblocksShopList() : "Не вдалося завантажити блоки"}
                 </div>
-            </div>
+            </BottomSheet>
         </main>
 
     )

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react"
 import TelegramAlert from "./components/TelegramAlert/TelegramAlert"
 import NavBar from "./components/NavBar/NavBar"
 import Home from "./pages/Home/Home"

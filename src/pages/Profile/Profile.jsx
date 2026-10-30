@@ -1,5 +1,5 @@
 import "./Profile.scss"
-import { use, useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { Logo, OpenChestIcon, CloseChestIcon } from "../../utils/icons"
 import { useUserContext } from "../../context/UserContext"
 import { has24HoursPassed, getRemainingTime } from "../../utils/convertTime"

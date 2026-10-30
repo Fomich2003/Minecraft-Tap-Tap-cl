@@ -91,14 +91,6 @@
         pointer-events: none;
     }
 
-    .Inventory__craft-message {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
-        clip-path: inset(50%);
-    }
-
     .Inventory__craft-slot--target {
         background: #a58c50;
         outline: 2px solid #fcae00;
@@ -211,7 +203,7 @@
         align-items: center;
         justify-content: center;
         cursor: grab;
-        touch-action: none;
+        touch-action: pan-y;
 
         &:active { cursor: grabbing; }
     }
@@ -235,6 +227,233 @@
         line-height: 1;
         text-shadow: 1px 1px 2px #111, -1px -1px 2px #111;
         pointer-events: none;
+    }
+
+    .Inventory__toolbar {
+        display: flex;
+        width: min(100%, 440px);
+        gap: 6px;
+        margin-bottom: 6px;
+    }
+
+    .Inventory__button {
+        display: flex;
+        min-width: 0;
+        min-height: 36px;
+        flex: 1;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 0 10px;
+        border: 1px solid rgb(1 71 53 / 35%);
+        border-radius: 10px;
+        background: var(--accent);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+
+        img {
+            width: 22px;
+            height: 22px;
+            image-rendering: pixelated;
+        }
+
+        span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        &:disabled {
+            opacity: .55;
+            cursor: default;
+        }
+
+        &--ghost {
+            flex: 0 0 auto;
+            background: #fff;
+            color: var(--accent);
+        }
+    }
+
+    .Inventory__craft-layout--slots {
+        grid-template-columns: minmax(0, 2.4fr) auto minmax(0, 1fr);
+    }
+
+    .Inventory__station-slots {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        gap: clamp(4px, 1.5vw, 8px);
+
+        .Inventory__craft-slot {
+            flex: 1 1 0;
+            max-width: 76px;
+        }
+    }
+
+    .Inventory__slot-label {
+        padding: 2px;
+        color: rgb(255 255 255 / 82%);
+        font-size: 9px;
+        font-weight: 700;
+        line-height: 1.1;
+        text-align: center;
+        pointer-events: none;
+    }
+
+    .Inventory__craft-cost {
+        position: absolute;
+        top: 2px;
+        left: 3px;
+        color: #ffe08a;
+        font-size: 10px;
+        font-weight: 800;
+        text-shadow: 1px 1px 2px #111;
+    }
+
+    .Inventory__choices {
+        display: flex;
+        width: min(100%, 440px);
+        max-height: 92px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px;
+        margin-top: 6px;
+        overflow-y: auto;
+
+        &--text .Inventory__choice {
+            width: 100%;
+            min-height: 28px;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: left;
+        }
+    }
+
+    .Inventory__choice {
+        position: relative;
+        display: flex;
+        width: 42px;
+        min-height: 42px;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #292929;
+        background: #8b8b8b;
+        color: #fff;
+        cursor: pointer;
+
+        img {
+            width: 78%;
+            height: 78%;
+            image-rendering: pixelated;
+        }
+
+        span {
+            position: absolute;
+            right: 2px;
+            bottom: 1px;
+            font-size: 10px;
+            font-weight: 800;
+            text-shadow: 1px 1px 2px #111;
+        }
+
+        &--active {
+            background: #b4a16b;
+            outline: 2px solid #fcae00;
+        }
+    }
+
+    .Inventory__message,
+    .Inventory__hint {
+        margin-top: 4px;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .Inventory__message { color: #a13c12; }
+    .Inventory__hint { color: var(--accent); }
+
+    .Inventory__job {
+        display: flex;
+        width: min(100%, 440px);
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        border: 3px solid #30251b;
+        background: linear-gradient(135deg, #9a7048, #74502f);
+        color: #fff;
+    }
+
+    .Inventory__job-image {
+        width: 48px;
+        height: 48px;
+        image-rendering: pixelated;
+    }
+
+    .Inventory__job-info {
+        display: flex;
+        min-width: 0;
+        flex: 1;
+        flex-direction: column;
+        gap: 3px;
+        font-size: 12px;
+    }
+
+    .Inventory__job-bar {
+        height: 8px;
+        overflow: hidden;
+        border: 1px solid #292929;
+        background: #5b5b5b;
+
+        i {
+            display: block;
+            height: 100%;
+            background: #fcae00;
+            transition: width 400ms linear;
+        }
+    }
+
+    .Inventory__job-actions {
+        display: flex;
+        width: min(100%, 440px);
+        gap: 6px;
+        margin-top: 6px;
+    }
+
+    .Inventory__details {
+        min-height: 18px;
+        margin-bottom: 4px;
+        overflow: hidden;
+        color: #15372d;
+        font-size: 12px;
+        font-weight: 800;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .Inventory__slot--selected {
+        outline: 2px solid #fcae00;
+    }
+
+    .Inventory__durability {
+        position: absolute;
+        right: 3px;
+        bottom: 3px;
+        left: 3px;
+        height: 3px;
+        background: #222;
+        pointer-events: none;
+
+        i {
+            display: block;
+            height: 100%;
+            background: #40cb04;
+        }
     }
 }
 

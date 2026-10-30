@@ -1,16 +1,8 @@
 import "./ServerImage.scss"
 import { API_CONF } from "../../config/api.config"
 
-function ServerImage({ imgSrc, imgClass = "" }) {
-    return (
-        <>
-            <img className={`ServerImage ${imgClass}`} src={API_CONF.baseFileUrl + imgSrc} alt="photo" />
-            {/* <p>{API_CONF.baseFileUrl + imgSrc}</p> */}
-        </>
-
-
-    )
+function ServerImage({ imgSrc, imgClass = "", alt = "" }) {
+    return <img className={`ServerImage ${imgClass}`} src={API_CONF.baseFileUrl + imgSrc} alt={alt} loading="lazy" draggable={false} />
 }
 
 export default ServerImage
-
