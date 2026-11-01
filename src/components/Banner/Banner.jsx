@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react"
 const WIDTH = 20
 const HEIGHT = 40
 
-// Кольори фарб з оригіналу. Банер малюється шарами, тому це єдине місце, що знає їхні значення
+// Кольори фарб з оригіналу. Банер малюється шарами, тому це єдине місце, що знає їхні значенн
 const DYE_COLORS = {
     white: "#f9fffe", orange: "#f9801d", magenta: "#c74ebd", light_blue: "#3ab3da", yellow: "#fed83d", lime: "#80c71f",
     pink: "#f38baa", gray: "#474f52", light_gray: "#9d9d97", cyan: "#169c9c", purple: "#8932b8", blue: "#3c44aa",
