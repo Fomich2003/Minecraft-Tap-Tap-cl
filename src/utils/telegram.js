@@ -1,5 +1,8 @@
 const BACKGROUND_COLOR = "#1e1f22"
 
+// Пряме посилання на застосунок бота: воно відкриває гру з підписом гравця
+const GAME_LINK = "https://t.me/minecraft_taptap_bot?startapp"
+
 const webApp = () => window.Telegram?.WebApp
 const supports = version => Boolean(webApp()?.isVersionAtLeast?.(version))
 
@@ -28,4 +31,10 @@ function haptic(kind) {
     if (supports("6.1")) HAPTICS[kind](webApp().HapticFeedback)
 }
 
-export { setupTelegram, haptic }
+// Посилання з чату відкривається у вбудованому браузері Telegram, де підпису немає. Гравця веде назад у застосунок
+function reopenInTelegram() {
+    const insideTelegram = /Telegram/i.test(navigator.userAgent) || Boolean(window.TelegramWebview || window.TelegramWebviewProxy)
+    if (insideTelegram && !webApp()?.initData) window.location.replace(GAME_LINK)
+}
+
+export { GAME_LINK, setupTelegram, reopenInTelegram, haptic }
