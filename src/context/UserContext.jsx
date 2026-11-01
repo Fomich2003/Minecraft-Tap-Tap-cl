@@ -192,6 +192,7 @@ const UserProvider = ({ children }) => {
 
     const saveLanguage = code => userService.setLanguage(telegramData, code)
 
+    const loadLeaderboard = metric => userService.leaderboard(telegramData, metric)
 
     return (
         <UserContext.Provider value={{
@@ -230,7 +231,8 @@ const UserProvider = ({ children }) => {
             recycleStack,
             loadQuests,
             claimQuest,
-            saveLanguage
+            saveLanguage,
+            loadLeaderboard
         }}>
             {children}
         </UserContext.Provider>

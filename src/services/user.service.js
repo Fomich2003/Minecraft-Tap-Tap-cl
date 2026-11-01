@@ -53,6 +53,10 @@ class UserService {
     return await this.post("/user/language", { telegramData, language })
   }
 
+  async leaderboard(telegramData, metric) {
+    return await this.post("/user/leaderboard", { telegramData, metric })
+  }
+
   post(path, body) {
     return smartFetch(path, {
       body: JSON.stringify(body),

@@ -9,6 +9,7 @@ import { useUserContext } from "./context/UserContext"
 import Tap from "./pages/Tap/Tap"
 import Inventory from "./pages/Inventory/Inventory"
 import Quests from "./pages/Quests/Quests"
+import Top from "./pages/Top/Top"
 import LanguageSheet from "./components/LanguageSheet/LanguageSheet"
 import { t, useLanguage } from "./i18n"
 
@@ -32,6 +33,7 @@ function App() {
           <Route path="/game" element={<Tap />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/quests" element={<Quests />} />
+          <Route path="/top" element={<Top />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

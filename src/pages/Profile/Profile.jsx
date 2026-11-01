@@ -8,6 +8,7 @@ import { formatNumber } from "../../utils/format"
 import { haptic } from "../../utils/telegram"
 import ServerImage from "../../components/ServerImage/ServerImage"
 import Banner from "../../components/Banner/Banner"
+import ReferralCard from "./ReferralCard"
 import { gameName, itemName, t } from "../../i18n"
 
 function Avatar({ photo, name }) {
@@ -34,7 +35,7 @@ function Stat({ icon, label, value, accent }) {
 }
 
 function Profile() {
-    const { user, inventory, stations, userBlocks, handleClaimAward, getFirstBlock, loadMobs } = useUserContext()
+    const { user, inventory, stations, userBlocks, handleClaimAward, getFirstBlock, loadMobs, syncProfile } = useUserContext()
     const [mobs, setMobs] = useState(null)
     const [now, setNow] = useState(() => Date.now())
     const [isClaiming, setIsClaiming] = useState(false)
@@ -53,6 +54,8 @@ function Profile() {
         loadMobs().then(result => {
             if (!cancelled && result.success) setMobs(result.mobs)
         })
+        // Друг міг приєднатися, поки гра була відкрита: нагорода й лічильник уже на сервері
+        syncProfile()
         return () => { cancelled = true }
         // eslint-disable-next-line react-hooks/exhaustive-deps -- статистика читається при відкритті профілю
     }, [])
@@ -155,6 +158,8 @@ function Profile() {
                 </div>}
                 {reward > 0 && <span className="Profile__reward" key={reward} onAnimationEnd={() => setReward(0)}>+{formatNumber(reward)}</span>}
             </section>
+
+            <ReferralCard />
 
             {message && <p className="Profile__message" role="alert">{message}</p>}
 

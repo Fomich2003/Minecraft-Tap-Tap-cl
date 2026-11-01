@@ -1,7 +1,9 @@
 const BACKGROUND_COLOR = "#1e1f22"
 
+const BOT_LINK = "https://t.me/minecraft_taptap_bot"
+
 // Пряме посилання на застосунок бота: воно відкриває гру з підписом гравця
-const GAME_LINK = "https://t.me/minecraft_taptap_bot?startapp"
+const GAME_LINK = `${BOT_LINK}?startapp`
 
 const webApp = () => window.Telegram?.WebApp
 const supports = version => Boolean(webApp()?.isVersionAtLeast?.(version))
@@ -37,4 +39,13 @@ function reopenInTelegram() {
     if (insideTelegram && !webApp()?.initData) window.location.replace(GAME_LINK)
 }
 
-export { GAME_LINK, setupTelegram, reopenInTelegram, haptic }
+// Реферальне посилання веде в чат із ботом: /start спрацьовує навіть без налаштованого головного застосунку
+const referralLink = userId => `${BOT_LINK}?start=ref_${userId}`
+
+function shareLink(url, text) {
+    const share = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`
+    if (supports("6.1")) webApp().openTelegramLink(share)
+    else window.open(share, "_blank", "noopener")
+}
+
+export { GAME_LINK, setupTelegram, reopenInTelegram, haptic, referralLink, shareLink }

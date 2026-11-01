@@ -9,6 +9,7 @@ const LINKS = [
     { to: "/game", label: "Гра", icon: "/items/diamond_pickaxe.png" },
     { to: "/inventory", label: "Інвентар", icon: "/items/crafting_table.png" },
     { to: "/quests", label: "Квести", icon: "/items/writable_book.png" },
+    { to: "/top", label: "Топ", icon: "/items/golden_helmet.png" },
     { to: "/profile", label: "Профіль", icon: "/items/player_head.png" },
 ]
 
