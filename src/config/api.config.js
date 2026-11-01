@@ -8,7 +8,8 @@ const CLIENT_CONF = {
 
 const API_CONF = {
     baseUrl: `${CLIENT_CONF.serverUrl}/api`,
-    baseFileUrl: CLIENT_CONF.serverUrl
+    // Іконки лежать у public/items: безплатний ngrok не віддає браузеру картинки без заголовка, який тег img не надсилає
+    baseFileUrl: ""
 }
 
 export { API_CONF, CLIENT_CONF }
