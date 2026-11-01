@@ -4,7 +4,7 @@
     gap: 10px;
 
     .Top__status {
-        padding: 32px 8px;
+        padding: 12px 8px;
         color: var(--text-muted);
         text-align: center;
     }
@@ -15,19 +15,33 @@
     }
 
     .Top__tab {
+        display: flex;
         min-width: 0;
-        min-height: 40px;
+        min-height: 42px;
         flex: 1;
-        overflow: hidden;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
         padding: 0 4px;
         border: 2px solid var(--outline);
         background: var(--surface-1);
         color: var(--text-muted);
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 800;
-        text-overflow: ellipsis;
-        white-space: nowrap;
         transition: background-color 90ms linear, color 90ms linear;
+
+        span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        img, svg {
+            width: 20px;
+            height: 20px;
+            flex: 0 0 auto;
+            object-fit: contain;
+        }
 
         &--active {
             background: var(--green);
@@ -36,57 +50,183 @@
         }
     }
 
-    .Top__mine {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
+    // Сцена з п'єдесталом: кожна таблиця стоїть у своєму світі
+    .Top__podium {
+        --ground: url("/assets/tiles/grass.png");
+        --sky: linear-gradient(180deg, #4f86e0, #9cc6f7);
 
-        h2 {
-            color: var(--text-muted);
-            font-size: 13px;
-            font-weight: 700;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        align-items: end;
+        gap: 6px;
+        overflow: hidden;
+        padding: 16px 10px 32px;
+        border: 2px solid var(--outline);
+        background: var(--ground) 0 100% / 32px 32px repeat-x, var(--sky);
+        box-shadow: inset 0 2px 0 rgb(255 255 255 / 18%);
+        image-rendering: pixelated;
+
+        &--coins {
+            --ground: url("/assets/tiles/stone.png");
+            --sky: linear-gradient(180deg, #16171b, #3a3d44);
+        }
+
+        &--bosses {
+            --ground: url("/assets/tiles/end_stone.png");
+            --sky: radial-gradient(circle at 18% 22%, #fff 0 1px, transparent 2px), radial-gradient(circle at 76% 14%, #fff 0 1px, transparent 2px), radial-gradient(circle at 88% 44%, #fff 0 1px, transparent 2px), radial-gradient(circle at 42% 8%, #fff 0 1px, transparent 2px), linear-gradient(180deg, #120822, #40215f);
         }
     }
 
-    .Top__mine ul,
-    .Top__list {
+    .Top__place {
+        position: relative;
         display: flex;
+        min-width: 0;
         flex-direction: column;
-        gap: 6px;
+        align-items: center;
+        gap: 3px;
+        animation: top-rise 420ms var(--ease-out) backwards;
+
+        // Другий ліворуч від першого, але читач екрана зустрічає гравців за порядком
+        &--2 { order: -1; animation-delay: 110ms; }
+        &--3 { animation-delay: 220ms; }
+
+        &--me .Top__avatar { outline: 3px solid #fff; outline-offset: -1px; }
+        &--me .Top__name { color: var(--xp); }
+
+        .Top__name {
+            width: 100%;
+            font-size: 13px;
+            text-align: center;
+            text-shadow: 1px 1px 0 rgb(0 0 0 / 80%);
+        }
+
+        // Довга сума переноситься на другий рядок: колонка на телефоні вужча за «123,5 млрд»
+        .Top__stat {
+            max-width: 100%;
+            justify-content: center;
+            padding: 2px 4px;
+            background: rgb(0 0 0 / 62%);
+            font-size: 9px;
+            overflow-wrap: anywhere;
+            text-align: center;
+        }
+    }
+
+    .Top__crown {
+        display: block;
+        margin-bottom: -10px;
+        animation: mc-bob 1800ms steps(8) infinite;
+
+        img {
+            display: block;
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            filter: drop-shadow(0 3px 0 rgb(0 0 0 / 40%));
+        }
+    }
+
+    .Top__avatar {
+        display: grid;
+        width: 48px;
+        height: 48px;
+        flex: 0 0 auto;
+        place-items: center;
+        border: 3px solid var(--outline);
+        background: var(--green);
+        box-shadow: inset 0 0 0 2px var(--green-hi), 0 3px 0 rgb(0 0 0 / 35%);
+        font-family: var(--font-pixel);
+        font-size: 18px;
+        line-height: 1;
+        text-shadow: 2px 2px 0 var(--green-lo);
+
+        &--empty {
+            background: rgb(0 0 0 / 35%);
+            box-shadow: none;
+            color: rgb(255 255 255 / 55%);
+            text-shadow: none;
+        }
+    }
+
+    .Top__place--1 .Top__avatar {
+        width: 58px;
+        height: 58px;
+        font-size: 22px;
+    }
+
+    .Top__pedestal {
+        position: relative;
+        display: grid;
+        width: 100%;
+        height: 48px;
+        margin-top: 3px;
+        place-items: center;
+        border: 2px solid var(--outline);
+        border-bottom: 0;
+        background: #6d6e72 url("/assets/tiles/stone.png") 0 0 / 48px 48px;
+        box-shadow: inset 2px 2px 0 rgb(255 255 255 / 35%), inset -2px 0 0 rgb(0 0 0 / 30%);
+        image-rendering: pixelated;
+
+        .Top__rank {
+            color: #fff;
+            font-family: var(--font-pixel);
+            font-size: 20px;
+            text-shadow: -2px 0 0 #000, 2px 0 0 #000, 0 -2px 0 #000, 0 2px 0 #000, 3px 3px 0 #000;
+        }
+    }
+
+    // Висота кратна блоку: текстура не обрізається посередині плитки
+    .Top__place--1 .Top__pedestal { height: 96px; }
+    .Top__place--2 .Top__pedestal { height: 72px; }
+
+    .Top__place--rank1 .Top__pedestal { background: #e8b923 url("/assets/tiles/gold_block.png") 0 0 / 48px 48px; }
+    .Top__place--rank2 .Top__pedestal { background: #c6ccd2 url("/assets/tiles/iron_block.png") 0 0 / 48px 48px; }
+    .Top__place--rank3 .Top__pedestal { background: #c47a3f url("/assets/tiles/copper_block.png") 0 0 / 48px 48px; }
+
+    // Решта гравців одна таблиця, а не окремі картки
+    .Top__list {
         margin: 0;
         padding: 0;
+        border: 2px solid var(--outline);
+        background: var(--surface-1);
         list-style: none;
     }
 
     .Top__row {
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 8px 10px;
-        animation: mc-rise 240ms var(--ease-out) backwards;
+        gap: 8px;
+        min-height: 50px;
+        padding-block: 6px;
+        padding-inline: 0 10px;
+        animation: mc-rise 220ms var(--ease-out) backwards;
 
-        &--me {
-            outline: 2px solid #fff;
-            outline-offset: -2px;
+        &:nth-child(even) { background: var(--surface-2); }
+        & + & { border-top: 2px solid var(--outline); }
+
+        .Top__rank {
+            min-width: 44px;
+            flex: 0 0 auto;
+            color: var(--text-muted);
+            font-family: var(--font-pixel);
+            font-size: 11px;
+            text-align: center;
         }
 
-        &--place1 .Top__rank { background: var(--gold-face); color: #2a1d00; }
-        &--place2 .Top__rank { background: #c6ccd2; color: #23272b; }
-        &--place3 .Top__rank { background: #c47a3f; color: #2b1505; }
-    }
+        > .Top__stat {
+            flex: 0 0 auto;
+            font-size: 11px;
 
-    .Top__rank {
-        display: grid;
-        min-width: 40px;
-        height: 40px;
-        flex: 0 0 auto;
-        place-items: center;
-        padding: 0 4px;
-        border: 2px solid var(--outline);
-        background: var(--slot);
-        box-shadow: inset 2px 2px 0 var(--slot-shade), inset -2px -2px 0 var(--slot-light);
-        font-family: var(--font-pixel);
-        font-size: 11px;
+            img, svg { width: 18px; height: 18px; }
+        }
+
+        &--me,
+        &--me:nth-child(even) {
+            background: #24401c;
+            border-inline-start: 4px solid var(--xp);
+
+            .Top__rank, .Top__name { color: var(--xp); }
+        }
     }
 
     .Top__player {
@@ -94,12 +234,12 @@
         min-width: 0;
         flex: 1;
         flex-direction: column;
-        gap: 4px;
+        gap: 2px;
     }
 
     .Top__name {
         overflow: hidden;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 800;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -108,24 +248,76 @@
     .Top__stats {
         display: flex;
         flex-wrap: wrap;
-        gap: 2px 12px;
+        gap: 0 10px;
     }
 
     .Top__stat {
         display: inline-flex;
+        min-width: 0;
         align-items: center;
-        gap: 4px;
-        color: var(--text-muted);
+        gap: 3px;
+        color: var(--text-faint);
         font-family: var(--font-pixel);
-        font-size: 9px;
+        font-size: 8px;
         line-height: 1.5;
 
-        &--active { color: var(--gold); }
+        &--active { color: var(--gold); font-size: 10px; }
 
         img, svg {
-            width: 16px;
-            height: 16px;
+            width: 13px;
+            height: 13px;
+            flex: 0 0 auto;
             object-fit: contain;
         }
     }
+
+    // Своє місце завжди перед очима, навіть коли гравець далеко за межами топу
+    .Top__mine {
+        position: sticky;
+        z-index: 2;
+        bottom: calc(var(--navbar-height) + var(--safe-bottom));
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 10px;
+        border: 2px solid var(--outline);
+        background: var(--green-lo);
+        box-shadow: inset 0 2px 0 var(--green);
+
+        .Top__stat { flex: 0 0 auto; font-size: 11px; }
+        .Top__stat img, .Top__stat svg { width: 18px; height: 18px; }
+    }
+
+    .Top__mine-rank {
+        min-width: 38px;
+        flex: 0 0 auto;
+        color: var(--xp);
+        font-family: var(--font-pixel);
+        font-size: 13px;
+        text-align: center;
+    }
+
+    .Top__mine-label {
+        min-width: 0;
+        flex: 1;
+        overflow: hidden;
+        font-size: 13px;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 340px) {
+    #Top .Top__tab {
+        gap: 3px;
+        font-size: 12px;
+
+        img, svg { width: 16px; height: 16px; }
+    }
+}
+
+@keyframes top-rise {
+    from { transform: translateY(70%); }
+    to { transform: translateY(0); }
 }
