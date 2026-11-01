@@ -2,6 +2,10 @@ import { useState } from "react"
 import BottomSheet from "../../components/BottomSheet/BottomSheet"
 import ServerImage from "../../components/ServerImage/ServerImage"
 import { useUserContext } from "../../context/UserContext"
+import { CoinIcon } from "../../utils/icons"
+import { formatNumber } from "../../utils/format"
+import { itemName, t } from "../../i18n"
+import { haptic } from "../../utils/telegram"
 
 function StationsSheet({ open, onClose }) {
     const { user, stations, activateStation, buyStation } = useUserContext()
@@ -11,6 +15,7 @@ function StationsSheet({ open, onClose }) {
         event.stopPropagation()
         const result = await buyStation(station.slug)
         setMessage(result.success ? "" : result.message)
+        haptic(result.success ? "success" : "error")
     }
 
     const handleActivate = async station => {
@@ -21,8 +26,7 @@ function StationsSheet({ open, onClose }) {
     }
 
     return (
-        <BottomSheet open={open} onClose={onClose} label="Вибір верстака">
-            <h2 className="BottomSheet__title">Верстаки</h2>
+        <BottomSheet open={open} onClose={onClose} label={t("Вибір верстака")} title={t("Верстаки")}>
             {message && <p className="BottomSheet__message">{message}</p>}
             <div className="BottomSheet__list">
                 {stations.map(station => (
@@ -32,18 +36,18 @@ function StationsSheet({ open, onClose }) {
                         aria-current={station.active ? "true" : undefined}
                         onClick={() => handleActivate(station)}
                     >
-                        <ServerImage imgSrc={station.icon} />
-                        <h3>{station.name}</h3>
+                        <ServerImage imgSrc={station.icon} alt="" />
+                        <h3>{itemName(station)}</h3>
                         {station.owned
-                            ? <span className="BottomSheet__owned">{station.active ? "Активний" : "Доступний"}</span>
+                            ? <span className="BottomSheet__owned">{t(station.active ? "Активний" : "Обрати")}</span>
                             : <>
-                                <p><strong>{station.price}</strong></p>
+                                <p><CoinIcon /> {formatNumber(station.price)}</p>
                                 <button
-                                    className="BottomSheet__buy"
+                                    className="mc-btn mc-btn--green mc-btn--small BottomSheet__buy"
                                     disabled={user.balance < station.price}
                                     onClick={event => handleBuy(event, station)}
                                 >
-                                    {user.balance < station.price ? "Бракує монет" : "Купити"}
+                                    {t(user.balance < station.price ? "Бракує" : "Купити")}
                                 </button>
                             </>}
                     </div>

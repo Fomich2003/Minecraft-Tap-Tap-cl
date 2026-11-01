@@ -4,8 +4,10 @@ import { BrowserRouter } from 'react-router-dom'
 import UserProvider from './context/UserContext.jsx'
 import './index.scss'
 import App from './App.jsx'
+import { initLanguage } from './i18n'
 
-createRoot(document.getElementById('root')).render(
+// Обрана мова вантажиться до першого малювання, інакше гравець побачить спалах української
+initLanguage().finally(() => createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <UserProvider>
@@ -14,4 +16,4 @@ createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </StrictMode>
 
-)
+))

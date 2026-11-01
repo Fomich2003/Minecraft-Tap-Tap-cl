@@ -1,8 +1,8 @@
-// Слоти кожного типу верстака. Вміст grid: сітка 3x3, у яку кладеться по одному предмету
+// Слоти кожного типу верстака. amount: скільки предметів кладеться за раз, якщо гравець не обрав інше
 const GRID_SLOTS = Array.from({ length: 9 }, (_, index) => ({ key: String(index), label: "" }))
 
 const STATION_LAYOUTS = {
-    grid: { slots: GRID_SLOTS, grid: true, single: true },
+    grid: { slots: GRID_SLOTS, grid: true, amount: 1 },
     stonecutter: { slots: [{ key: "input", label: "Блок" }], choices: "recipes" },
     smithing: {
         slots: [

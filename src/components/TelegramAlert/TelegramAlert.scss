@@ -1,39 +1,57 @@
 .telegramAlert {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     min-height: 100vh;
     min-height: 100dvh;
-    background: var(--bg);
+    align-items: center;
+    justify-content: center;
+    padding: 24px var(--content-padding);
+    background: url("/assets/tiles/dirt.png") 0 0 / 64px 64px;
+    box-shadow: inset 0 0 0 100vmax rgb(0 0 0 / 62%);
 
-    svg {
-        width: 100%;
-        height: auto;
-        object-fit: contain;
-        max-width: 400px;
-        display: block;
-        margin: 0 auto;
-    }
-
-    h1 {
-        color: var(--text);
-        font-size: 28px;
-        margin-bottom: 20px;
+    &__content {
+        display: flex;
+        width: min(100%, 420px);
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
         text-align: center;
+        animation: mc-rise 280ms var(--ease-out);
 
+        .Logo {
+            width: min(60vw, 220px);
+            height: auto;
+            image-rendering: auto;
+            filter: drop-shadow(0 8px 0 rgb(0 0 0 / 40%));
+            animation: mc-bob 2400ms ease-in-out infinite;
+        }
+
+        h1 { font-size: 24px; }
+
+        p {
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1.45;
+        }
     }
 
-    p {
-        color: var(--text);
-        font-size: 22px;
-        margin-bottom: 30px;
-        text-align: center;
-    }
+    &__bar {
+        width: min(100%, 280px);
+        height: 14px;
+        overflow: hidden;
+        border: 2px solid #fff;
+        background: #000;
 
-    a {
-        max-width: 200px;
-        margin: 0 auto;
-
+        i {
+            display: block;
+            width: 40%;
+            height: 100%;
+            background: var(--xp);
+            animation: telegram-alert-load 1100ms steps(14) infinite;
+        }
     }
+}
+
+@keyframes telegram-alert-load {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(250%); }
 }

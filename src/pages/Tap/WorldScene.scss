@@ -1,0 +1,632 @@
+.World {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #05050a;
+
+    // Під землею краї екрана тонуть у темряві
+    &::after {
+        position: absolute;
+        z-index: 2;
+        inset: 0;
+        background: radial-gradient(ellipse 72% 62% at 50% 52%, transparent 55%, rgb(0 0 0 / 62%) 100%);
+        content: "";
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 3s linear;
+    }
+
+    &--deep::after {
+        opacity: 1;
+    }
+}
+
+// Блок завжди стоїть на тій самій відстані від центру сцени, тому підлога локації прив'язана саме до неї
+.World__anchor {
+    position: absolute;
+    top: calc(50% + 66px);
+    left: 50%;
+    width: 640px;
+    height: 0;
+    margin-left: -320px;
+}
+
+// Камера їде готовою картою: зсув не перемальовує сторінку
+.World__camera {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 640px;
+    height: 8000px;
+    transition: transform 0ms cubic-bezier(.5, 0, .22, 1);
+    will-change: transform;
+}
+
+.World__sky {
+    position: absolute;
+    top: -600px;
+    right: 0;
+    left: 0;
+    height: 1100px;
+    background: linear-gradient(180deg, #3f76d4 0%, #6fa6ee 62%, #d6e9ff 100%);
+}
+
+.World__holder {
+    position: absolute;
+    inset: 0;
+}
+
+.World__map {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+}
+
+// Живі деталі з'являються після прильоту
+.World__life {
+    position: absolute;
+    right: 0;
+    left: 0;
+    height: 640px;
+    overflow: visible;
+    animation: world-life 700ms linear both;
+    pointer-events: none;
+}
+
+.World__place {
+    position: absolute;
+    z-index: 3;
+    top: 16%;
+    right: 0;
+    left: 0;
+    color: #fff;
+    font-size: 26px;
+    font-weight: 800;
+    text-align: center;
+    text-shadow: 2px 2px 0 rgb(0 0 0 / 75%);
+    animation: world-place 2600ms var(--ease-out) both;
+    pointer-events: none;
+}
+
+.World__sun {
+    position: absolute;
+    top: 176px;
+    left: calc(50% - 158px);
+    width: 56px;
+    height: 56px;
+    background: #fff7b8;
+    box-shadow: 0 0 0 8px rgb(255 247 184 / 35%), 0 0 0 20px rgb(255 247 184 / 16%);
+}
+
+.World__cloud {
+    position: absolute;
+    left: 0;
+    width: 104px;
+    height: 18px;
+    background: #fff;
+    box-shadow: 16px -12px 0 -1px #fff, 44px -12px 0 -1px #fff, 62px -22px 0 -6px #fff;
+    opacity: .92;
+    animation: world-cloud 78s linear infinite;
+}
+
+.World__bird {
+    position: absolute;
+    width: 8px;
+    height: 3px;
+    background: #2b3440;
+    box-shadow: 8px -3px 0 #2b3440, -8px -3px 0 #2b3440;
+    animation: world-bird 26s linear infinite;
+}
+
+.World__flame {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background: radial-gradient(circle at 50% 42%, rgb(255 210 120 / 95%) 0 6%, rgb(255 150 40 / 55%) 14%, transparent 45%);
+    animation: world-flicker 900ms steps(4) infinite;
+}
+
+.World__drip {
+    position: absolute;
+    top: 170px;
+    width: 3px;
+    height: 7px;
+    background: #7fb8ff;
+    opacity: 0;
+    animation: world-drip 7s ease-in infinite;
+}
+
+.World__bat {
+    position: absolute;
+    left: 0;
+    width: 7px;
+    height: 7px;
+    background: #17131c;
+    box-shadow: -7px -3px 0 #17131c, 7px -3px 0 #17131c;
+    animation: world-bat 15s linear infinite;
+
+    &--far {
+        scale: .7;
+        animation-delay: -6s;
+        animation-duration: 21s;
+    }
+}
+
+.World__spark {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #d5a6ff;
+    animation: world-twinkle 3.2s steps(5) infinite;
+}
+
+.World__pulse {
+    position: absolute;
+    width: 170px;
+    height: 70px;
+    background: radial-gradient(closest-side, rgb(40 220 220 / 42%), transparent);
+    animation: world-pulse 3.6s ease-in-out infinite;
+}
+
+// Анімовані текстури рідин із гри: стрічка кадрів зсувається крок за кроком
+.World__lava,
+.World__fall {
+    position: absolute;
+    image-rendering: pixelated;
+}
+
+.World__lava {
+    background: url("/assets/tiles/lava_strip.png") 0 0 / 32px auto;
+    animation: world-strip 4s steps(20) infinite;
+    --strip: 640px;
+}
+
+.World__fall {
+    width: 32px;
+    background-size: 32px auto;
+    animation: world-strip 3.2s steps(16) infinite;
+
+    &--lava {
+        background-image: url("/assets/tiles/lavafall_strip.png");
+        box-shadow: 0 0 22px rgb(255 110 20 / 55%);
+        --strip: 512px;
+    }
+
+    &--water {
+        background-image: url("/assets/tiles/water_strip.png");
+        animation-timing-function: steps(32);
+        opacity: .88;
+        --strip: 1024px;
+    }
+}
+
+.World__glow {
+    position: absolute;
+    top: 230px;
+    right: -40px;
+    left: -40px;
+    height: 260px;
+    background: linear-gradient(180deg, transparent, rgb(255 90 10 / 24%));
+    animation: world-pulse 4.2s ease-in-out infinite;
+}
+
+.World__ember {
+    position: absolute;
+    top: 500px;
+    width: 4px;
+    height: 4px;
+    background: #ffb347;
+    box-shadow: 0 0 6px #ff7a1a;
+    animation: world-ember 7s linear infinite;
+}
+
+.World__star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #f0e6ff;
+    animation: world-twinkle 4s steps(6) infinite;
+}
+
+.World__portal {
+    position: absolute;
+    top: 470px;
+    width: 4px;
+    height: 4px;
+    background: #b26bff;
+    box-shadow: 0 0 6px #7a2cff;
+    animation: world-ember 8s linear infinite;
+}
+
+// Кристал Краю на вершині стовпа
+.World__crystal {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #ffd8ff, #c14fe0 55%, #5b1f8c);
+    box-shadow: 0 0 18px rgb(214 110 255 / 80%);
+    animation: world-crystal 2.8s ease-in-out infinite;
+}
+
+// Промінь від сонця дихає разом із небом
+.World__sun::after {
+    position: absolute;
+    inset: -34px;
+    background: radial-gradient(closest-side, rgb(255 247 184 / 34%), transparent);
+    content: "";
+    animation: world-pulse 5s ease-in-out infinite;
+}
+
+.World__leaf {
+    position: absolute;
+    top: 338px;
+    width: 5px;
+    height: 4px;
+    background: #5f9c43;
+    box-shadow: 2px 2px 0 #4a7f33;
+    opacity: 0;
+    animation: world-leaf 8s linear infinite;
+}
+
+.World__butterfly {
+    position: absolute;
+    left: 0;
+    width: 3px;
+    height: 5px;
+    background: #2b2320;
+    box-shadow: -4px -1px 0 1px currentcolor, 4px -1px 0 1px currentcolor;
+    animation: world-butterfly 20s ease-in-out infinite, world-flap .32s steps(2) infinite;
+}
+
+.World__smoke {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgb(190 190 190 / 60%);
+    opacity: 0;
+    animation: world-smoke 2.7s ease-out infinite;
+}
+
+.World__mote {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #ffe7b0;
+    opacity: 0;
+    animation: world-mote 8s ease-in-out infinite;
+}
+
+.World__splash {
+    position: absolute;
+    top: 474px;
+    width: 3px;
+    height: 3px;
+    background: #bcd9ff;
+    opacity: 0;
+    animation: world-splash 1.5s ease-out infinite;
+}
+
+.World__ripple {
+    position: absolute;
+    top: 492px;
+    width: 58px;
+    height: 2px;
+    background: rgb(200 225 255 / 70%);
+    opacity: 0;
+    animation: world-ripple 2.6s ease-out infinite;
+}
+
+// Заряд скалка біжить по підлозі, як у грі
+.World__charge {
+    position: absolute;
+    top: 476px;
+    left: 120px;
+    width: 10px;
+    height: 5px;
+    background: #38f0e0;
+    box-shadow: 0 0 12px 3px rgb(56 240 224 / 75%);
+    opacity: 0;
+    animation: world-charge 5.2s linear infinite;
+}
+
+.World__soul {
+    position: absolute;
+    top: 460px;
+    width: 4px;
+    height: 4px;
+    background: #9ff5ec;
+    box-shadow: 0 0 6px rgb(120 240 230 / 80%);
+    opacity: 0;
+    animation: world-soul 8s ease-out infinite;
+}
+
+.World__bubble {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    background: #ffd27a;
+    box-shadow: 0 0 8px rgb(255 150 40 / 80%);
+    opacity: 0;
+    animation: world-bubble 4.4s ease-out infinite;
+}
+
+.World__ghast {
+    position: absolute;
+    top: 196px;
+    left: 0;
+    width: 56px;
+    height: 56px;
+    background: url("/assets/world/ghast.png") 0 0 / 100% 100%;
+    image-rendering: pixelated;
+    animation: world-ghast 46s linear infinite, world-bob 5s ease-in-out infinite;
+
+    // Щупальця моба
+    span {
+        position: absolute;
+        top: 100%;
+        left: 6px;
+        width: 6px;
+        height: 22px;
+        background: #d8d4d4;
+        box-shadow: 14px -3px 0 #c9c5c5, 26px 2px 0 #d8d4d4, 38px -5px 0 #c9c5c5;
+    }
+
+    &--far {
+        top: 128px;
+        opacity: .62;
+        scale: .55;
+        animation-delay: -27s, -2s;
+        animation-direction: reverse, normal;
+        animation-duration: 64s, 6s;
+    }
+}
+
+.World__ash {
+    position: absolute;
+    top: 120px;
+    width: 3px;
+    height: 3px;
+    background: #6f6464;
+    opacity: 0;
+    animation: world-ash 9s linear infinite;
+}
+
+.World__nebula {
+    position: absolute;
+    top: 30px;
+    left: 60px;
+    width: 420px;
+    height: 300px;
+    background: radial-gradient(closest-side, rgb(170 70 230 / 42%), transparent);
+    animation: world-nebula 18s ease-in-out infinite;
+
+    &--far {
+        top: 150px;
+        left: 240px;
+        background: radial-gradient(closest-side, rgb(60 110 240 / 30%), transparent);
+        animation-delay: -7s;
+        animation-duration: 26s;
+    }
+}
+
+.World__comet {
+    position: absolute;
+    top: 96px;
+    left: 80px;
+    width: 46px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #fff);
+    opacity: 0;
+    rotate: 18deg;
+    animation: world-comet 9s ease-in infinite;
+
+    &--late {
+        top: 150px;
+        left: 240px;
+        animation-delay: -5.5s;
+        animation-duration: 13s;
+    }
+}
+
+// Промінь кристала Краю
+.World__beam {
+    position: absolute;
+    height: 4px;
+    background: linear-gradient(90deg, rgb(255 190 255 / 90%), rgb(170 90 255 / 35%));
+    box-shadow: 0 0 10px rgb(214 110 255 / 70%);
+    transform-origin: 0 50%;
+    animation: world-pulse 2.2s ease-in-out infinite;
+}
+
+// Швидкість спуску: породи пролітають повз камеру
+.World__streaks {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+
+    i {
+        position: absolute;
+        top: 0;
+        width: 2px;
+        height: 90px;
+        background: linear-gradient(180deg, transparent, rgb(255 255 255 / 26%), transparent);
+        animation: world-streak 1s linear infinite;
+    }
+
+    &--up i { animation-direction: reverse; }
+}
+
+// Без руху камера прибуває одразу, тож чекати кінця польоту нічого
+@media (prefers-reduced-motion: reduce) {
+    .World__life,
+    .World__place {
+        animation-delay: 0ms !important;
+    }
+
+    .World__streaks { display: none; }
+}
+
+@keyframes world-leaf {
+    0% { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+    8% { opacity: 1; }
+    35% { transform: translate(14px, 48px) rotate(120deg); }
+    65% { transform: translate(-6px, 92px) rotate(230deg); }
+    90% { opacity: 1; }
+    100% { opacity: 0; transform: translate(12px, 136px) rotate(340deg); }
+}
+
+@keyframes world-butterfly {
+    0%, 100% { transform: translate(140px, 0); }
+    25% { transform: translate(250px, -34px); }
+    50% { transform: translate(370px, 8px); }
+    75% { transform: translate(490px, -26px); }
+}
+
+@keyframes world-flap {
+    from { scale: 1 1; }
+    to { scale: .35 1; }
+}
+
+@keyframes world-smoke {
+    0% { opacity: 0; transform: translateY(0) scale(.7); }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: translate(5px, -38px) scale(1.6); }
+}
+
+@keyframes world-mote {
+    0%, 100% { opacity: 0; transform: translate(0, 0); }
+    30%, 70% { opacity: .85; }
+    50% { transform: translate(16px, -24px); }
+}
+
+@keyframes world-splash {
+    0% { opacity: 0; transform: translate(0, 0); }
+    20% { opacity: 1; transform: translate(-5px, -14px); }
+    100% { opacity: 0; transform: translate(-10px, 8px); }
+}
+
+@keyframes world-ripple {
+    0% { opacity: .9; transform: scaleX(.2); }
+    100% { opacity: 0; transform: scaleX(1); }
+}
+
+@keyframes world-charge {
+    0% { opacity: 0; transform: translateX(0); }
+    8%, 92% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(330px); }
+}
+
+@keyframes world-soul {
+    0% { opacity: 0; transform: translate(0, 0); }
+    25% { opacity: .9; }
+    100% { opacity: 0; transform: translate(-14px, -170px); }
+}
+
+@keyframes world-bubble {
+    0%, 62% { opacity: 0; transform: translateY(8px) scale(.4); }
+    74% { opacity: 1; transform: translateY(-4px) scale(1); }
+    90% { opacity: 1; transform: translateY(-18px) scale(1.3); }
+    100% { opacity: 0; transform: translateY(-8px) scale(.5); }
+}
+
+@keyframes world-ghast {
+    from { transform: translateX(-90px); }
+    to { transform: translateX(730px); }
+}
+
+@keyframes world-bob {
+    0%, 100% { translate: 0 -8px; }
+    50% { translate: 0 10px; }
+}
+
+@keyframes world-ash {
+    0% { opacity: 0; transform: translate(0, 0); }
+    12% { opacity: .85; }
+    88% { opacity: .85; }
+    100% { opacity: 0; transform: translate(-46px, 340px); }
+}
+
+@keyframes world-nebula {
+    0%, 100% { opacity: .55; transform: translate(0, 0) scale(1); }
+    50% { opacity: 1; transform: translate(26px, 14px) scale(1.14); }
+}
+
+@keyframes world-comet {
+    0%, 78% { opacity: 0; transform: translateX(0); }
+    82% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(300px); }
+}
+
+@keyframes world-streak {
+    from { transform: translateY(1000px); }
+    to { transform: translateY(-120px); }
+}
+
+@keyframes world-life {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes world-place {
+    0% { opacity: 0; transform: translateY(14px); }
+    18%, 72% { opacity: 1; transform: none; }
+    100% { opacity: 0; transform: translateY(-8px); }
+}
+
+@keyframes world-cloud {
+    from { transform: translateX(-160px); }
+    to { transform: translateX(800px); }
+}
+
+@keyframes world-bird {
+    from { transform: translateX(-60px); }
+    to { transform: translateX(700px); }
+}
+
+@keyframes world-flicker {
+    0%, 100% { opacity: 1; scale: 1; }
+    50% { opacity: .78; scale: 1.1; }
+}
+
+@keyframes world-drip {
+    0%, 62% { opacity: 0; transform: translateY(0); }
+    66% { opacity: 1; }
+    100% { opacity: .9; transform: translateY(300px); }
+}
+
+@keyframes world-bat {
+    0% { transform: translate(-40px, 0); }
+    25% { transform: translate(180px, -30px); }
+    50% { transform: translate(340px, 18px); }
+    75% { transform: translate(520px, -22px); }
+    100% { transform: translate(700px, 0); }
+}
+
+@keyframes world-twinkle {
+    0%, 100% { opacity: .15; }
+    50% { opacity: 1; }
+}
+
+@keyframes world-pulse {
+    0%, 100% { opacity: .35; }
+    50% { opacity: 1; }
+}
+
+@keyframes world-strip {
+    from { background-position-y: 0; }
+    to { background-position-y: calc(var(--strip) * -1); }
+}
+
+@keyframes world-ember {
+    0% { opacity: 0; transform: translate(0, 0); }
+    15% { opacity: 1; }
+    100% { opacity: 0; transform: translate(26px, -420px); }
+}
+
+@keyframes world-crystal {
+    0%, 100% { transform: translateY(0) rotate(45deg) scale(.68); }
+    50% { transform: translateY(-8px) rotate(45deg) scale(.76); }
+}

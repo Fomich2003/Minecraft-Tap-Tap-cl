@@ -11,6 +11,14 @@ class StationService {
         return post("/station/list", { telegramData })
     }
 
+    installBookshelves(telegramData) {
+        return post("/station/bookshelves", { telegramData })
+    }
+
+    recipes(telegramData) {
+        return post("/station/recipes", { telegramData })
+    }
+
     buy(telegramData, slug) {
         return post(`/station/${slug}/buy`, { telegramData })
     }
@@ -23,8 +31,8 @@ class StationService {
         return post(`/station/${slug}/preview`, { telegramData, slots, options })
     }
 
-    apply(telegramData, slug, slots, options) {
-        return post(`/station/${slug}/apply`, { telegramData, slots, options })
+    apply(telegramData, slug, slots, options, times) {
+        return post(`/station/${slug}/apply`, { telegramData, slots, options, times })
     }
 
     job(telegramData, slug) {
@@ -41,6 +49,10 @@ class StationService {
 
     brew(telegramData, slug, slots) {
         return post(`/station/${slug}/brew`, { telegramData, slots })
+    }
+
+    fill(telegramData, slug, slots, count) {
+        return post(`/station/${slug}/fill`, { telegramData, slots, count })
     }
 
     collect(telegramData, slug) {

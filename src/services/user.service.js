@@ -23,7 +23,45 @@ class UserService {
     })
   }
 
-  
+  async upgradeTap(telegramData) {
+    return await smartFetch("/user/upgrade", {
+      body: JSON.stringify({telegramData}),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+  }
+
+  async equipment(telegramData) {
+    return await this.post("/user/equipment", { telegramData })
+  }
+
+  async equip(telegramData, stackId, kind) {
+    return await this.post("/user/equip", { telegramData, stackId, kind })
+  }
+
+  async consume(telegramData, stackId) {
+    return await this.post("/user/consume", { telegramData, stackId })
+  }
+
+  async hangBanner(telegramData, stackId) {
+    return await this.post("/user/banner", { telegramData, stackId });
+  }
+
+  async setLanguage(telegramData, language) {
+    return await this.post("/user/language", { telegramData, language })
+  }
+
+  post(path, body) {
+    return smartFetch(path, {
+      body: JSON.stringify(body),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+  }
 
 }
 

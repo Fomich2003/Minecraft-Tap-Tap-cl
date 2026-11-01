@@ -34,6 +34,8 @@ class BlockService {
         return await smartFetch("/block/tap", {
             body: JSON.stringify({ telegramData, slug, count }),
             method: "POST",
+            // Запит має дійти, навіть якщо гравець щойно згорнув застосунок
+            keepalive: true,
             headers: {
                 "Content-Type": "application/json"
             }

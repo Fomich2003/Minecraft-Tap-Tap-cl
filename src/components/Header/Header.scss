@@ -1,38 +1,102 @@
 .Header {
-    background-color: var(--accent);
     position: fixed;
+    z-index: 1000;
     top: 0;
     left: 50%;
     width: 100%;
     max-width: var(--max-content-width);
+    padding-top: var(--safe-top);
+    border-bottom: 2px solid var(--outline);
+    background: var(--surface-1);
+    box-shadow: inset 0 -2px 0 var(--hi);
     transform: translateX(-50%);
 
     &__wrapper {
         display: flex;
-        justify-content: space-between;
-        padding: 0 var(--content-padding);
-        height: var(--navbar-height);
+        height: calc(var(--header-height) - 2px);
         align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding-inline: var(--content-padding) 12px;
     }
 
-    &__logo svg {
-        width: 55px;
-        height: 55px;
+    &__logo {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+
+        .Logo {
+            flex: 0 0 auto;
+            image-rendering: auto;
+            transition: transform 120ms var(--ease-pop);
+        }
+
+        @media (hover: hover) {
+            &:hover .Logo { transform: rotate(-4deg) scale(1.08); }
+        }
+    }
+
+    &__title {
+        overflow: hidden;
+        font-size: 18px;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__side {
+        display: flex;
+        flex: 0 0 auto;
+        align-items: center;
+        gap: 6px;
+    }
+
+    &__language {
+        display: flex;
+        min-height: 36px;
+        align-items: center;
+        gap: 5px;
+        padding: 0 7px;
+        border: 2px solid var(--outline);
+        background: var(--surface-3);
+        box-shadow: inset 0 2px 0 var(--hi), inset 0 -2px 0 var(--lo);
+        font-family: var(--font-pixel);
+        font-size: 9px;
+        transition: background-color 90ms linear;
+
+        @media (hover: hover) {
+            &:hover { background: var(--surface-4); }
+        }
+
+        .mc-globe {
+            width: 18px;
+            height: 18px;
+        }
     }
 
     &__balance {
         display: flex;
+        flex: 0 0 auto;
+        min-height: 36px;
         align-items: center;
-        gap: 10px;
+        gap: 7px;
+        padding: 0 10px;
+        border: 2px solid var(--outline);
+        background: var(--surface-2);
+        box-shadow: inset 0 2px 0 var(--hi), inset 0 -2px 0 var(--lo);
+        color: var(--gold);
+        font-family: var(--font-pixel);
+        font-size: 12px;
 
-        span {
-            color: var(--white);
-            font-size: 18px;
-        }
-
-        svg {
-            width: 36px;
-            height: 36px;
+        .mc-coin {
+            width: 20px;
+            height: 20px;
         }
     }
+}
+
+@media (max-width: 340px) {
+    .Header__title { display: none; }
 }

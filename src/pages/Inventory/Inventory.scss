@@ -1,8 +1,13 @@
 #Inventory {
+    // Розмір слота залежить і від ширини, і від висоти екрана
+    --slot-size: clamp(36px, min(15.5vw, 8.4dvh), 62px);
+
     width: 100%;
     height: 100%;
     min-height: 0;
     overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
 
     .Inventory__wrapper {
         display: flex;
@@ -10,253 +15,43 @@
         height: 100%;
         min-height: 0;
         flex-direction: column;
-        gap: clamp(8px, 2dvh, 14px);
+        gap: 8px;
     }
 
-    .Inventory__section-title {
-        margin-bottom: 6px;
-        color: #15372d;
-        font-size: clamp(14px, 3.8vw, 18px);
-        font-weight: 900;
-        letter-spacing: .04em;
+    .Inventory__empty {
+        padding: 32px 8px;
+        color: var(--text-muted);
         text-align: center;
-        text-transform: uppercase;
-        text-shadow: 1px 1px 0 rgb(255 255 255 / 55%);
     }
 
+    // Панель верстака може довго рости, але сітка предметів завжди лишається на екрані
     .Inventory__craft {
         display: flex;
+        min-height: 0;
+        max-height: 56%;
         flex: 0 0 auto;
         flex-direction: column;
-        align-items: center;
-    }
-
-    .Inventory__craft-layout {
-        display: grid;
-        width: min(100%, 440px);
-        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-        align-items: center;
-        justify-items: center;
-        gap: clamp(8px, 3vw, 18px);
-        padding: clamp(8px, 2vw, 12px);
-        border: 3px solid #30251b;
-        background: linear-gradient(135deg, #9a7048, #74502f);
-        box-shadow: inset 3px 3px 0 rgb(255 255 255 / 15%), inset -3px -3px 0 rgb(0 0 0 / 28%), 0 4px 0 #49301f;
-    }
-
-    .Inventory__craft-grid {
-        display: grid;
-        width: 100%;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: clamp(3px, 1vw, 5px);
-    }
-
-    .Inventory__craft-slot,
-    .Inventory__craft-result {
-        position: relative;
-        display: flex;
-        min-width: 0;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        aspect-ratio: 1;
-        border: 2px solid #292929;
-        background: #777;
-        box-shadow: inset 2px 2px 0 rgb(255 255 255 / 23%), inset -2px -2px 0 rgb(0 0 0 / 24%);
-    }
-
-    .Inventory__craft-result--ready {
-        background: #b4a16b;
-        outline: 2px solid #fcae00;
-        box-shadow: 0 0 12px rgb(252 174 0 / 55%), inset 3px 3px 0 rgb(255 255 255 / 25%), inset -3px -3px 0 rgb(0 0 0 / 28%);
-        cursor: pointer;
-
-        &:hover:not(:disabled) {
-            filter: brightness(1.12);
-            transform: scale(1.04);
-        }
-    }
-
-    .Inventory__craft-result:disabled { cursor: default; }
-
-    .Inventory__craft-result-count {
-        position: absolute;
-        right: 3px;
-        bottom: 2px;
-        color: #fff;
-        font-size: 13px;
-        font-weight: 800;
-        line-height: 1;
-        text-shadow: 1px 1px 2px #111, -1px -1px 2px #111;
-        pointer-events: none;
-    }
-
-    .Inventory__craft-slot--target {
-        background: #a58c50;
-        outline: 2px solid #fcae00;
-        transform: scale(1.06);
-    }
-
-    .Inventory__craft-item {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: grab;
-        touch-action: none;
-    }
-
-    .Inventory__craft-arrow {
-        color: #f1e4c7;
-        font-size: clamp(22px, 6vw, 32px);
-        font-weight: 900;
-        text-shadow: 2px 2px #352619;
-    }
-
-    .Inventory__craft-result {
-        width: 100%;
-        max-width: none;
-        border-width: 3px;
-        background: #8b8b8b;
-        box-shadow: inset 3px 3px 0 rgb(255 255 255 / 25%), inset -3px -3px 0 rgb(0 0 0 / 28%), 0 0 0 2px #55412c;
-        padding: 0;
-        border-radius: 0;
-        color: inherit;
-        cursor: default;
-    }
-
-    .Inventory__craft-result--ready {
-        background: #b4a16b;
-        outline: 2px solid #fcae00;
-        box-shadow: 0 0 12px rgb(252 174 0 / 55%), inset 3px 3px 0 rgb(255 255 255 / 25%), inset -3px -3px 0 rgb(0 0 0 / 28%);
-        cursor: pointer;
-
-        &:hover:not(:disabled) {
-            filter: brightness(1.12);
-            transform: scale(1.04);
-        }
-    }
-
-    .Inventory__craft-result:disabled { cursor: default; }
-
-    .Inventory__craft-result-count {
-        position: absolute;
-        right: 3px;
-        bottom: 2px;
-        color: #fff;
-        font-size: 13px;
-        font-weight: 800;
-        line-height: 1;
-        text-shadow: 1px 1px 2px #111, -1px -1px 2px #111;
-        pointer-events: none;
-    }
-
-    .Inventory__items {
-        display: flex;
-        min-height: 0;
-        flex: 1 1 0;
-        flex-direction: column;
-        padding-top: clamp(4px, 1.5dvh, 10px);
-    }
-
-    .Inventory__grid {
-        display: grid;
-        width: 100%;
-        min-height: 0;
-        grid-auto-rows: max-content;
-        gap: clamp(3px, 1vw, 5px);
-        overflow-x: hidden;
-        overflow-y: auto;
-        padding: clamp(5px, 1.5vw, 8px);
-        border: 1px solid var(--accent);
-        border-radius: 10px;
-        background: var(--accent);
-        overscroll-behavior: contain;
+        align-items: stretch;
+        gap: 6px;
+        overflow: hidden auto;
         scrollbar-width: thin;
-        scrollbar-color: #739487 var(--accent);
-    }
-
-    .Inventory__slot {
-        position: relative;
-        display: flex;
-        min-width: 0;
-        aspect-ratio: 1;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid rgb(1 71 53 / 35%);
-        border-radius: 4px;
-        background: #8b8b8b;
-        box-shadow: inset 2px 2px 0 rgb(255 255 255 / 24%), inset -2px -2px 0 rgb(0 0 0 / 18%);
-        transition: background-color 120ms ease, transform 120ms ease;
-
-        &--target {
-            background: #686868;
-            transform: scale(1.04);
-        }
-    }
-
-    .Inventory__item {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: grab;
-        touch-action: pan-y;
-
-        &:active { cursor: grabbing; }
-    }
-
-    .Inventory__image {
-        width: 76%;
-        height: 76%;
-        object-fit: contain;
-        image-rendering: pixelated;
-        pointer-events: none;
-        user-select: none;
-    }
-
-    .Inventory__count {
-        position: absolute;
-        right: 3px;
-        bottom: 2px;
-        color: #fff;
-        font-size: clamp(10px, 3vw, 13px);
-        font-weight: 700;
-        line-height: 1;
-        text-shadow: 1px 1px 2px #111, -1px -1px 2px #111;
-        pointer-events: none;
     }
 
     .Inventory__toolbar {
         display: flex;
-        width: min(100%, 440px);
         gap: 6px;
-        margin-bottom: 6px;
     }
 
-    .Inventory__button {
-        display: flex;
+    .Inventory__station {
         min-width: 0;
-        min-height: 36px;
         flex: 1;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        padding: 0 10px;
-        border: 1px solid rgb(1 71 53 / 35%);
-        border-radius: 10px;
-        background: var(--accent);
-        color: #fff;
-        font-size: 13px;
-        font-weight: 800;
-        cursor: pointer;
+        justify-content: flex-start;
 
         img {
             width: 22px;
             height: 22px;
-            image-rendering: pixelated;
+            flex: 0 0 22px;
+            object-fit: contain;
         }
 
         span {
@@ -264,72 +59,262 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-
-        &:disabled {
-            opacity: .55;
-            cursor: default;
-        }
-
-        &--ghost {
-            flex: 0 0 auto;
-            background: #fff;
-            color: var(--accent);
-        }
     }
 
-    .Inventory__craft-layout--slots {
-        grid-template-columns: minmax(0, 2.4fr) auto minmax(0, 1fr);
+    .Inventory__craft-layout {
+        display: grid;
+        grid-template-columns: auto auto minmax(0, 1fr);
+        align-items: center;
+        justify-content: center;
+        justify-items: center;
+        gap: clamp(8px, 2.6vw, 16px);
+        padding: 10px;
+        border: 2px solid var(--outline);
+        background: var(--surface-3);
+        box-shadow: inset 0 2px 0 var(--hi), inset 0 -2px 0 var(--lo);
+    }
+
+    .Inventory__craft-grid {
+        display: grid;
+        grid-template-columns: repeat(3, var(--slot-size));
+        grid-auto-rows: var(--slot-size);
+        gap: 3px;
     }
 
     .Inventory__station-slots {
         display: flex;
-        width: 100%;
+        min-width: 0;
+        flex-wrap: wrap;
         justify-content: center;
-        gap: clamp(4px, 1.5vw, 8px);
+        gap: 6px;
 
         .Inventory__craft-slot {
-            flex: 1 1 0;
-            max-width: 76px;
+            width: var(--slot-size);
+            height: var(--slot-size);
         }
     }
 
+    .Inventory__craft-slot,
+    .Inventory__craft-result,
+    .Inventory__slot {
+        position: relative;
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--outline);
+        background: var(--slot);
+        box-shadow: inset 2px 2px 0 var(--slot-shade), inset -2px -2px 0 var(--slot-light);
+        transition: background-color 80ms linear, transform 100ms var(--ease-pop);
+
+        @media (hover: hover) {
+            &:hover:not(:disabled) { background: var(--slot-hover); }
+        }
+    }
+
+    .Inventory__craft-slot--target,
+    .Inventory__slot--target {
+        background: #c9b458 !important;
+        outline: 2px solid var(--gold);
+        outline-offset: -2px;
+        transform: scale(1.05);
+    }
+
+    .Inventory__craft-item,
+    .Inventory__item {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: grab;
+        -webkit-touch-callout: none;
+
+        &:active { cursor: grabbing; }
+    }
+
+    .Inventory__craft-item {
+        touch-action: none;
+        animation: mc-pop 140ms var(--ease-pop);
+    }
+
+    .Inventory__item {
+        // Вертикальний свайп лишається прокруткою сітки
+        touch-action: pan-y;
+    }
+
+    .Inventory__image {
+        width: 76%;
+        height: 76%;
+        object-fit: contain;
+        pointer-events: none;
+    }
+
+    .Inventory__count {
+        position: absolute;
+        right: 3px;
+        bottom: 3px;
+        color: #fff;
+        font-family: var(--font-pixel);
+        font-size: 10px;
+        line-height: 1;
+        text-shadow: 1px 1px 0 #000, 2px 2px 0 #3a3a3a;
+        pointer-events: none;
+    }
+
     .Inventory__slot-label {
+        max-width: 100%;
+        max-height: 100%;
         padding: 2px;
-        color: rgb(255 255 255 / 82%);
+        overflow: hidden;
+        color: #1e1e1f;
         font-size: 9px;
-        font-weight: 700;
+        font-weight: 800;
         line-height: 1.1;
+        overflow-wrap: anywhere;
         text-align: center;
         pointer-events: none;
     }
 
+    .Inventory__craft-arrow {
+        color: var(--text-muted);
+        font-size: clamp(16px, 5vw, 22px);
+        line-height: 1;
+    }
+
+    .Inventory__craft-layout--slots {
+        padding: 6px;
+
+        .Inventory__result { max-width: calc(var(--slot-size) * 1.1); }
+    }
+
+    .Inventory__result {
+        display: flex;
+        width: 100%;
+        max-width: calc(var(--slot-size) * 1.5);
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    .Inventory__craft-result {
+        width: 100%;
+        aspect-ratio: 1;
+        border-width: 3px;
+        cursor: default;
+
+        &--ready {
+            background: #b7a24c;
+            outline: 2px solid var(--gold);
+            outline-offset: -5px;
+            cursor: pointer;
+
+            @media (hover: hover) {
+                &:hover:not(:disabled) { background: #c9b458; }
+            }
+
+            &:active:not(:disabled) { transform: scale(.94); }
+        }
+    }
+
+    .Inventory__result-art {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: mc-pop 180ms var(--ease-pop);
+    }
+
+    .Inventory__craft-all {
+        min-height: 30px;
+        padding-right: 4px;
+        padding-left: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        animation: mc-pop 160ms var(--ease-pop);
+    }
+
     .Inventory__craft-cost {
         position: absolute;
-        top: 2px;
-        left: 3px;
-        color: #ffe08a;
-        font-size: 10px;
-        font-weight: 800;
-        text-shadow: 1px 1px 2px #111;
+        top: 3px;
+        left: 4px;
+        color: var(--gold);
+        font-family: var(--font-pixel);
+        font-size: 8px;
+        text-shadow: 1px 1px 0 #1a1a1a;
     }
 
     .Inventory__choices {
         display: flex;
-        width: min(100%, 440px);
-        max-height: 92px;
+        max-height: 78px;
+        flex: 0 0 auto;
         flex-wrap: wrap;
         justify-content: center;
         gap: 4px;
-        margin-top: 6px;
         overflow-y: auto;
+    }
 
-        &--text .Inventory__choice {
-            width: 100%;
-            min-height: 28px;
-            padding: 4px 8px;
+    // Три пропозиції столу зачарувань стоять поруч: усі видно одразу, а числа читаються без перекладу
+    .Inventory__offers {
+        display: grid;
+        flex: 0 0 auto;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 4px;
+    }
+
+    .Inventory__offer {
+        display: flex;
+        min-width: 0;
+        min-height: 44px;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: center;
+        gap: 3px;
+        padding: 4px;
+        border: 2px solid var(--outline);
+        background: var(--slot);
+        box-shadow: inset 2px 2px 0 var(--slot-shade), inset -2px -2px 0 var(--slot-light);
+        color: #1e1e1f;
+        transition: background-color 80ms linear, transform 90ms var(--ease-pop);
+
+        &:active { transform: scale(.97); }
+
+        strong {
+            overflow: hidden;
             font-size: 11px;
-            font-weight: 700;
-            text-align: left;
+            font-weight: 800;
+            line-height: 1.15;
+            text-align: center;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            font-family: var(--font-pixel);
+            font-size: 9px;
+        }
+
+        b {
+            margin-inline-end: 4px;
+            color: #1f6b12;
+            font-weight: 400;
+        }
+
+        img {
+            width: 13px;
+            height: 13px;
+            object-fit: contain;
+        }
+
+        &--active {
+            background: #b7a24c;
+            outline: 2px solid var(--gold);
+            outline-offset: -2px;
         }
     }
 
@@ -340,58 +325,57 @@
         min-height: 42px;
         align-items: center;
         justify-content: center;
-        border: 2px solid #292929;
-        background: #8b8b8b;
-        color: #fff;
-        cursor: pointer;
+        border: 2px solid var(--outline);
+        background: var(--slot);
+        color: var(--text);
 
         img {
             width: 78%;
             height: 78%;
-            image-rendering: pixelated;
+            object-fit: contain;
         }
 
         span {
             position: absolute;
             right: 2px;
-            bottom: 1px;
-            font-size: 10px;
-            font-weight: 800;
-            text-shadow: 1px 1px 2px #111;
+            bottom: 2px;
+            font-family: var(--font-pixel);
+            font-size: 8px;
+            text-shadow: 1px 1px 0 #1a1a1a;
         }
 
         &--active {
-            background: #b4a16b;
-            outline: 2px solid #fcae00;
+            background: #b7a24c;
+            outline: 2px solid var(--gold);
+            outline-offset: -2px;
         }
     }
 
     .Inventory__message,
     .Inventory__hint {
-        margin-top: 4px;
         font-size: 12px;
         font-weight: 700;
         text-align: center;
     }
 
-    .Inventory__message { color: #a13c12; }
-    .Inventory__hint { color: var(--accent); }
+    .Inventory__message { color: #ffb4ab; }
+    .Inventory__hint { color: var(--text-muted); }
 
     .Inventory__job {
         display: flex;
-        width: min(100%, 440px);
         align-items: center;
         gap: 10px;
         padding: 10px;
-        border: 3px solid #30251b;
-        background: linear-gradient(135deg, #9a7048, #74502f);
-        color: #fff;
+        border: 2px solid var(--outline);
+        background: var(--surface-3);
+        box-shadow: inset 0 2px 0 var(--hi), inset 0 -2px 0 var(--lo);
     }
 
     .Inventory__job-image {
         width: 48px;
         height: 48px;
-        image-rendering: pixelated;
+        flex: 0 0 48px;
+        object-fit: contain;
     }
 
     .Inventory__job-info {
@@ -401,64 +385,372 @@
         flex-direction: column;
         gap: 3px;
         font-size: 12px;
-    }
+        font-weight: 500;
 
-    .Inventory__job-bar {
-        height: 8px;
-        overflow: hidden;
-        border: 1px solid #292929;
-        background: #5b5b5b;
-
-        i {
-            display: block;
-            height: 100%;
-            background: #fcae00;
-            transition: width 400ms linear;
+        strong {
+            overflow: hidden;
+            font-size: 15px;
+            font-weight: 800;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
 
     .Inventory__job-actions {
         display: flex;
-        width: min(100%, 440px);
         gap: 6px;
-        margin-top: 6px;
+
+        .mc-btn { flex: 1; }
+    }
+
+    .Inventory__items {
+        display: flex;
+        min-height: 0;
+        flex: 1 1 0;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .Inventory__bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
     }
 
     .Inventory__details {
-        min-height: 18px;
-        margin-bottom: 4px;
+        min-width: 0;
+        flex: 1;
         overflow: hidden;
-        color: #15372d;
+        color: var(--text-muted);
         font-size: 12px;
-        font-weight: 800;
-        text-align: center;
+        font-weight: 700;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
+    // Повідомлення про ефект довге і, на відміну від назви предмета, має читатись повністю
+    .Inventory__details--notice {
+        color: var(--xp);
+        font-size: 11px;
+        line-height: 1.15;
+        white-space: normal;
+    }
+
+    .Inventory__book {
+        flex: 0 0 auto;
+        padding-right: 6px;
+        padding-left: 6px;
+
+        img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+        }
+    }
+
+    .Inventory__banner {
+        height: 84%;
+        pointer-events: none;
+    }
+
+    // Підказка як у грі: темна рамка з фіолетовим контуром
+    .Inventory__tooltip {
+        display: flex;
+        flex: 0 0 auto;
+        flex-direction: column;
+        gap: 1px;
+        padding: 5px 8px;
+        border: 2px solid #1f0f2e;
+        outline: 1px solid #5a2ca0;
+        outline-offset: -3px;
+        background: rgb(16 0 16 / 94%);
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.25;
+        animation: mc-rise 120ms var(--ease-out);
+
+        strong {
+            color: #7df9ff;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        span { color: #b9b9c6; }
+    }
+
+    // Полиці стоять навколо столу, порожні місця видно здалеку
+    .Inventory__shelves {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 8px;
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 700;
+
+        .mc-btn {
+            min-height: 28px;
+            flex: 0 0 auto;
+        }
+    }
+
+    // Усі 18 полиць в один рядок: стіл зачарувань не має забирати екран в інвентаря
+    .Inventory__shelf-row {
+        display: grid;
+        flex: 1 1 100%;
+        grid-template-columns: repeat(18, minmax(0, 1fr));
+        gap: 1px;
+
+        img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: contain;
+        }
+
+        .Inventory__shelf--empty {
+            filter: grayscale(1) brightness(.45);
+            opacity: .5;
+        }
+    }
+
+    // Вибір як у грі: сітка слотів із самими предметами чи візерунками
+    .Inventory__choices--grid,
+    .Inventory__choices--patterns {
+        display: grid;
+        max-height: 138px;
+        padding: 4px;
+        border: 2px solid var(--outline);
+        background: var(--surface-3);
+        box-shadow: inset 2px 2px 0 var(--lo);
+
+        .Inventory__choice {
+            box-shadow: inset 2px 2px 0 var(--slot-shade), inset -2px -2px 0 var(--slot-light);
+            transition: transform 90ms var(--ease-pop), background-color 80ms linear;
+
+            @media (hover: hover) {
+                &:hover { background: var(--slot-hover); transform: scale(1.06); }
+            }
+        }
+    }
+
+    .Inventory__choices--grid {
+        grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+
+        .Inventory__choice { width: 100%; }
+    }
+
+    .Inventory__choices--patterns {
+        grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+
+        .Inventory__choice {
+            width: 100%;
+            min-height: 62px;
+            padding: 3px;
+            overflow: hidden;
+        }
+
+        .Banner { height: 52px; }
+    }
+
+    .Inventory__actions {
+        display: flex;
+        flex: 0 0 auto;
+        gap: 6px;
+
+        .mc-btn {
+            min-width: 0;
+            min-height: 36px;
+            flex: 1;
+            font-size: 13px;
+            animation: mc-pop 160ms var(--ease-pop);
+        }
+    }
+
+    // Шторка рецептів живе всередині інвентаря
+    .Recipe__locked {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 28px 16px;
+        color: var(--text-muted);
+        font-size: 14px;
+        text-align: center;
+
+        img {
+            width: 64px;
+            height: 64px;
+            filter: grayscale(.6);
+        }
+    }
+
+    .Recipe__list {
+        grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+    }
+
+    .Recipe__detail {
+        display: grid;
+        flex: 0 0 auto;
+        grid-template-columns: auto auto auto 1fr;
+        align-items: center;
+        gap: 4px 10px;
+        padding: 8px;
+        border: 2px solid var(--outline);
+        background: var(--surface-3);
+        animation: mc-rise 140ms var(--ease-out);
+
+        strong {
+            min-width: 0;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .mc-btn { grid-column: 1 / -1; }
+    }
+
+    .Recipe__grid {
+        display: grid;
+        grid-template-columns: repeat(3, 32px);
+        grid-auto-rows: 32px;
+        gap: 2px;
+    }
+
+    .Recipe__grid--brewing {
+        grid-template-columns: repeat(2, 32px);
+    }
+
+    .Recipe__cell,
+    .Recipe__result {
+        position: relative;
+        display: grid;
+        place-items: center;
+        border: 2px solid var(--outline);
+        background: var(--slot);
+        box-shadow: inset 2px 2px 0 var(--slot-shade), inset -2px -2px 0 var(--slot-light);
+
+        img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+        }
+    }
+
+    .Recipe__result {
+        width: 48px;
+        height: 48px;
+
+        img { width: 32px; height: 32px; }
+
+        small {
+            position: absolute;
+            right: 2px;
+            bottom: 2px;
+            font-family: var(--font-pixel);
+            font-size: 9px;
+            text-shadow: 1px 1px 0 #000;
+        }
+    }
+
+    .Recipe__arrow { color: var(--text-muted); }
+
+    .Inventory__amounts {
+        display: flex;
+        flex: 0 0 auto;
+    }
+
+    .Inventory__amount {
+        min-width: 32px;
+        min-height: 30px;
+        margin-inline-start: -2px;
+        padding: 0 6px;
+        border: 2px solid var(--outline);
+        background: var(--surface-2);
+        color: var(--text-muted);
+        font-size: 13px;
+        font-weight: 800;
+        transition: background-color 80ms linear, color 80ms linear;
+
+        &--active {
+            background: var(--green);
+            box-shadow: inset 0 2px 0 var(--green-hi), inset 0 -2px 0 var(--green-lo);
+            color: var(--text);
+        }
+    }
+
+    .Inventory__grid {
+        display: grid;
+        min-height: 0;
+        flex: 0 1 auto;
+        grid-auto-rows: max-content;
+        align-content: start;
+        gap: 3px;
+        overflow: hidden auto;
+        padding: 6px;
+        border: 2px solid var(--outline);
+        background: var(--surface-3);
+        box-shadow: inset 0 2px 0 var(--hi), inset 0 -2px 0 var(--lo);
+        overscroll-behavior: contain;
+        scrollbar-color: var(--surface-4) transparent;
+        scrollbar-width: thin;
+    }
+
+    .Inventory__slot {
+        aspect-ratio: 1;
+    }
+
     .Inventory__slot--selected {
-        outline: 2px solid #fcae00;
+        outline: 2px solid #fff;
+        outline-offset: -2px;
+    }
+
+    .Inventory__equipped {
+        position: absolute;
+        top: 3px;
+        inset-inline-start: 3px;
+        width: 7px;
+        height: 7px;
+        border: 1px solid var(--outline);
+        background: var(--xp);
     }
 
     .Inventory__durability {
         position: absolute;
-        right: 3px;
-        bottom: 3px;
-        left: 3px;
+        right: 4px;
+        bottom: 4px;
+        left: 4px;
         height: 3px;
-        background: #222;
+        background: #111;
         pointer-events: none;
 
         i {
             display: block;
             height: 100%;
-            background: #40cb04;
+            background: var(--xp);
         }
+    }
+
+    .Inventory__ghost {
+        position: fixed;
+        z-index: 1100;
+        top: 0;
+        left: 0;
+        display: flex;
+        width: 58px;
+        height: 58px;
+        align-items: center;
+        justify-content: center;
+        filter: drop-shadow(0 6px 0 rgb(0 0 0 / 35%));
+        pointer-events: none;
     }
 }
 
-@media (max-height: 650px) {
+// На низькому екрані лічильника досить, а місце потрібне сітці предметів
+@media (max-height: 700px) {
+    #Inventory .Inventory__shelf-row { display: none; }
+}
+
+@media (max-height: 600px) {
+    #Inventory .Inventory__craft-layout { padding: 6px; }
     #Inventory .Inventory__wrapper { gap: 5px; }
-    #Inventory .Inventory__craft-layout { width: min(100%, 360px); padding: 6px; }
-    #Inventory .Inventory__section-title { margin-bottom: 3px; font-size: 13px; }
 }

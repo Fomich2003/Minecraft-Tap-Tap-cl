@@ -1,3 +1,6 @@
 .ServerImage {
     display: block;
+    image-rendering: pixelated;
+    user-select: none;
+    -webkit-user-drag: none;
 }

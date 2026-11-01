@@ -1,26 +1,22 @@
 import "./TelegramAlert.scss"
 import { Logo } from "../../utils/icons"
+import { t } from "../../i18n"
 
-const ACCESS_DENIED = "Доступ заборонено! Minecraft Tap-Tap - це телеграм додаток. Перейдіть в бота для відкриття додатку"
+const ACCESS_DENIED = "Minecraft Tap-Tap працює всередині Telegram. Відкрий бота, щоб почати гру."
 
-function TelegramAlert({ title = "Minecraft Tap-Tap", message = title === "Minecraft Tap-Tap" ? ACCESS_DENIED : "", onRetry }) {
-
-    return (<div className="telegramAlert">
-        <section className="home">
-            <div className="container">
-                <div className="home__wrapper">
-                    <div className="home__content">
-                        <Logo />
-                        <h1>{title}</h1>
-                        {message && <p>{message}</p>}
-                        {onRetry
-                            ? <button type="button" className="btn" onClick={onRetry}>Спробувати ще раз</button>
-                            : !title.endsWith("...") && <a className="btn" href="https://t.me/minecraft_taptap_bot">Відкрити бота</a>}
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>)
+function TelegramAlert({ title = "Minecraft Tap-Tap", message = title === "Minecraft Tap-Tap" ? t(ACCESS_DENIED) : "", onRetry, loading = false }) {
+    return (
+        <div className="telegramAlert">
+            <section className="telegramAlert__content">
+                <Logo size={220} />
+                <h1>{title}</h1>
+                {message && <p>{message}</p>}
+                {loading && <div className="telegramAlert__bar" role="progressbar" aria-label={title}><i /></div>}
+                {onRetry && <button type="button" className="mc-btn mc-btn--green" onClick={onRetry}>{t("Спробувати ще раз")}</button>}
+                {!onRetry && !loading && <a className="mc-btn mc-btn--green" href="https://t.me/minecraft_taptap_bot">{t("Відкрити бота")}</a>}
+            </section>
+        </div>
+    )
 }
 
 export default TelegramAlert

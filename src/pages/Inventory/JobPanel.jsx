@@ -4,22 +4,28 @@ import stationService from "../../services/station.service"
 import { useUserContext } from "../../context/UserContext"
 import { STATION_LAYOUTS, slotsPayload } from "../../config/stations.config"
 import { StationSlot, ResultButton } from "./StationSlots"
+import { t } from "../../i18n"
+import { identityOf } from "../../utils/placement"
+import { itemIcon } from "../../utils/item-icon"
+import { stackLabel } from "../../utils/item-details"
 
 const CAMPFIRE_CAPACITY = 4
 const FURNACE_CAPACITY = 64
 const MAX_BOTTLES = 3
+const EMPTY_BOTTLE = "glass_bottle"
 
 function JobPanel({ station, placed, dragOver, handlers, onApplied }) {
-    const { telegramData, catalog, applyResult } = useUserContext()
+    const { telegramData, catalog, inventory, applyResult } = useUserContext()
     const layout = STATION_LAYOUTS[station.uiType]
     const isBrewing = station.uiType === "brewing"
     const slots = layout.slots.filter(slot => station.needsFuel || isBrewing || slot.key !== "fuel")
 
     const [job, setJob] = useState(null)
-    const [cookPreview, setCookPreview] = useState(null)
+    const [loadedPreview, setLoadedPreview] = useState(null)
     const [brewingFuel, setBrewingFuel] = useState(0)
     const [message, setMessage] = useState("")
     const [now, setNow] = useState(() => Date.now())
+    const [isBusy, setIsBusy] = useState(false)
 
     const adoptJob = value => setJob(value ? { ...value, startedAtMs: Date.now() - value.elapsedMs } : null)
 
@@ -39,24 +45,30 @@ function JobPanel({ station, placed, dragOver, handlers, onApplied }) {
         return () => clearInterval(timer)
     }, [job])
 
+    const hasInput = !isBrewing && Boolean(placed.input)
+
     useEffect(() => {
-        if (isBrewing || !placed.input) {
-            setCookPreview(null)
-            return
-        }
+        if (!hasInput) return
         let cancelled = false
         stationService.cookPreview(telegramData, station.slug, slotsPayload(placed)).then(response => {
-            if (!cancelled) setCookPreview(response.success ? response.preview : null)
+            if (!cancelled) setLoadedPreview(response.success ? response.preview : null)
         })
         return () => { cancelled = true }
-    }, [placed, isBrewing, station.slug, telegramData])
+    }, [placed, hasInput, station.slug, telegramData])
 
+    const cookPreview = hasInput ? loadedPreview : null
     const capacity = station.slug === "campfire" ? CAMPFIRE_CAPACITY : FURNACE_CAPACITY
     const inputCount = Math.min(placed.input?.count ?? 0, capacity)
     const fuelUnits = cookPreview?.burnTicks ? Math.ceil(cookPreview.cookTicks * inputCount / cookPreview.burnTicks) : 0
     const hasFuel = !station.needsFuel || (cookPreview?.burnTicks > 0 && fuelUnits <= (placed.fuel?.count ?? 0))
     const canCook = !isBrewing && cookPreview && inputCount > 0 && hasFuel
-    const canBrew = isBrewing && placed.bottle && placed.reagent && (brewingFuel > 0 || placed.fuel)
+    const bottle = isBrewing ? placed.bottle : null
+    const isEmptyBottle = bottle?.entry.itemId.slug === EMPTY_BOTTLE
+    // Зілля не стакаються, тому в слоті лежить одне, а стійка бере однакові пляшечки з усього інвентаря
+    const ownedBottles = bottle ? inventory.items.filter(stack => stack.itemId && identityOf(stack) === identityOf(bottle.entry)).reduce((sum, stack) => sum + stack.quantity, 0) : 0
+    const bottleCount = Math.min(MAX_BOTTLES, isEmptyBottle ? bottle.count : ownedBottles)
+    const shownSlots = bottle && !isEmptyBottle ? { ...placed, bottle: { ...bottle, count: bottleCount } } : placed
+    const canBrew = bottle && !isEmptyBottle && placed.reagent && (brewingFuel > 0 || placed.fuel)
 
     const finish = response => {
         applyResult(response)
@@ -67,19 +79,31 @@ function JobPanel({ station, placed, dragOver, handlers, onApplied }) {
         }
     }
 
-    const start = async () => {
+    const run = async action => {
+        if (isBusy) return
+        setIsBusy(true)
+        await action()
+        setIsBusy(false)
+    }
+
+    const start = () => run(async () => {
         if (isBrewing) {
-            const bottleCount = Math.min(MAX_BOTTLES, placed.bottle.count)
             finish(await stationService.brew(telegramData, station.slug, { ...slotsPayload(placed), bottleCount }))
             const status = await stationService.job(telegramData, station.slug)
             if (status.success) setBrewingFuel(status.brewingFuel ?? 0)
         } else {
             finish(await stationService.cook(telegramData, station.slug, slotsPayload(placed), inputCount))
         }
-    }
+    })
 
-    const collect = async () => finish(await stationService.collect(telegramData, station.slug))
-    const cancel = async () => finish(await stationService.cancel(telegramData, station.slug))
+    const fill = () => run(async () => {
+        const response = applyResult(await stationService.fill(telegramData, station.slug, { bottle: bottle.entry._id }, bottleCount))
+        setMessage(response.success ? "" : response.message)
+        if (response.success) handlers.placeBottle(response.inventory)
+    })
+
+    const collect = () => run(async () => finish(await stationService.collect(telegramData, station.slug)))
+    const cancel = () => run(async () => finish(await stationService.cancel(telegramData, station.slug)))
 
     if (job) {
         const elapsed = Math.max(0, now - job.startedAtMs)
@@ -87,18 +111,19 @@ function JobPanel({ station, placed, dragOver, handlers, onApplied }) {
         const ready = finished - job.collected
         const percent = Math.min(100, elapsed / (job.units * job.unitMs) * 100)
         const output = catalog?.items.find(entry => entry.slug === job.output.slug)
+        const outputName = output && stackLabel({ itemId: output, components: job.output.components }, catalog)
         return <>
             <div className="Inventory__job">
-                {output && <ServerImage imgSrc={output.icon} imgClass="Inventory__job-image" alt={output.name} />}
+                {output && <ServerImage imgSrc={itemIcon(output, job.output.components)} imgClass="Inventory__job-image" alt={outputName} />}
                 <div className="Inventory__job-info">
-                    <strong>{output?.name}</strong>
-                    <span>Готово {finished} з {job.units}</span>
-                    <div className="Inventory__job-bar"><i style={{ width: `${percent}%` }} /></div>
+                    <strong>{outputName}</strong>
+                    <span>{t("Готово {finished} з {total}", { finished, total: job.units })}</span>
+                    <div className="mc-xp"><i style={{ width: `${percent}%` }} /></div>
                 </div>
             </div>
             <div className="Inventory__job-actions">
-                <button className="Inventory__button" disabled={ready < 1} onClick={collect}>Забрати{ready > 0 ? ` ${ready * job.output.quantity}` : ""}</button>
-                <button className="Inventory__button Inventory__button--ghost" onClick={cancel}>Скасувати</button>
+                <button className="mc-btn mc-btn--small mc-btn--green" disabled={ready < 1 || isBusy} onClick={collect}>{t("Забрати")}{ready > 0 ? ` ${ready * job.output.quantity}` : ""}</button>
+                <button className="mc-btn mc-btn--small" disabled={isBusy} onClick={cancel}>{t("Скасувати")}</button>
             </div>
             {message && <p className="Inventory__message">{message}</p>}
         </>
@@ -107,18 +132,22 @@ function JobPanel({ station, placed, dragOver, handlers, onApplied }) {
     return <>
         <div className="Inventory__craft-layout Inventory__craft-layout--slots">
             <div className="Inventory__station-slots">
-                {slots.map(slot => <StationSlot key={slot.key} slot={slot} placed={placed} dragOver={dragOver} handlers={handlers} />)}
+                {slots.map(slot => <StationSlot key={slot.key} slot={slot} placed={shownSlots} dragOver={dragOver} handlers={handlers} />)}
             </div>
-            <span className="Inventory__craft-arrow" aria-hidden="true">→</span>
-            <ResultButton result={cookPreview?.result} catalog={catalog} disabled />
+            <span className="Inventory__craft-arrow" aria-hidden="true">▶</span>
+            <div className="Inventory__result">
+                <ResultButton result={cookPreview?.result} catalog={catalog} disabled />
+            </div>
         </div>
         <div className="Inventory__job-actions">
-            <button className="Inventory__button" disabled={!canCook && !canBrew} onClick={start}>
-                {isBrewing ? "Варити" : `Почати${inputCount ? ` (${inputCount})` : ""}`}
-            </button>
+            {isEmptyBottle
+                ? <button className="mc-btn mc-btn--small mc-btn--green" disabled={isBusy} onClick={fill}>{t("Налити воду")} ({bottleCount})</button>
+                : <button className="mc-btn mc-btn--small mc-btn--green" disabled={(!canCook && !canBrew) || isBusy} onClick={start}>
+                    {isBrewing ? `${t("Варити")}${bottleCount ? ` (${bottleCount})` : ""}` : `${t("Почати")}${inputCount ? ` (${inputCount})` : ""}`}
+                </button>}
         </div>
-        {isBrewing && <p className="Inventory__hint">Запас палива: {brewingFuel}</p>}
-        {!isBrewing && station.needsFuel && placed.input && !hasFuel && <p className="Inventory__message">Потрібно палива: {fuelUnits || "покладіть паливо"}</p>}
+        {isBrewing && <p className="Inventory__hint">{t("Запас палива: {count}", { count: brewingFuel })}</p>}
+        {!isBrewing && station.needsFuel && placed.input && !hasFuel && <p className="Inventory__message">{fuelUnits ? t("Потрібно палива: {count}", { count: fuelUnits }) : t("Поклади паливо")}</p>}
         {message && <p className="Inventory__message">{message}</p>}
     </>
 }
