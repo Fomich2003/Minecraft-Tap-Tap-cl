@@ -1,0 +1,89 @@
+.CardReveal {
+    position: fixed;
+    z-index: 30;
+    top: calc(var(--header-height) + var(--safe-top) + 64px);
+    left: 50%;
+    display: flex;
+    width: 150px;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+    translate: -50% 0;
+    animation: card-reveal-life 3200ms var(--ease-out) both;
+    pointer-events: none;
+    perspective: 700px;
+
+    &__card {
+        position: relative;
+        display: block;
+        width: 104px;
+        animation: card-reveal-flip 1100ms var(--ease-out) both;
+    }
+
+    &__rays {
+        position: absolute;
+        top: -34px;
+        left: 50%;
+        width: 220px;
+        height: 220px;
+        margin-left: -110px;
+        border-radius: 50%;
+        background: repeating-conic-gradient(rgb(255 240 160 / 32%) 0 10deg, transparent 10deg 30deg);
+        mask: radial-gradient(circle, #000 20%, transparent 68%);
+        animation: card-reveal-spin 9000ms linear infinite;
+    }
+
+    // У грі карта вилітає збоку, щоб не закривати блок і сповіщення про дроп
+    &--side {
+        top: calc(var(--header-height) + var(--safe-top) + 150px);
+        right: max(8px, calc((100vw - var(--max-content-width)) / 2 + 8px));
+        left: auto;
+        translate: none;
+    }
+
+    &--epic &__rays { background: repeating-conic-gradient(rgb(200 140 255 / 32%) 0 10deg, transparent 10deg 30deg); }
+    &--rare &__rays { background: repeating-conic-gradient(rgb(130 170 255 / 30%) 0 10deg, transparent 10deg 30deg); }
+    &--common &__rays { background: repeating-conic-gradient(rgb(255 255 255 / 22%) 0 10deg, transparent 10deg 30deg); }
+
+    strong,
+    > span:not(.CardReveal__rays, .CardReveal__card) {
+        position: relative;
+        max-width: 100%;
+        padding: 2px 8px;
+        border: 2px solid var(--outline);
+        background: var(--surface-1);
+    }
+
+    strong {
+        margin-top: 6px;
+        color: var(--xp);
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.25;
+    }
+
+    > span:not(.CardReveal__rays, .CardReveal__card) {
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 700;
+    }
+}
+
+@keyframes card-reveal-life {
+    0% { opacity: 0; }
+    8%, 86% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-14px); }
+}
+
+// Летить згори ребром і повільно розвертається лицем
+@keyframes card-reveal-flip {
+    0% { transform: translateY(-60px) rotateY(90deg) rotateZ(-8deg) scale(.6); }
+    45% { transform: translateY(6px) rotateY(-12deg) rotateZ(2deg) scale(1.08); }
+    75% { transform: translateY(0) rotateY(4deg) scale(1); }
+    100% { transform: none; }
+}
+
+@keyframes card-reveal-spin {
+    to { rotate: 360deg; }
+}

@@ -1,0 +1,391 @@
+#Cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .Cards__status {
+        padding: 32px 8px;
+        color: var(--text-muted);
+        text-align: center;
+    }
+
+    .Cards__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+
+        h2 { font-size: 18px; }
+    }
+
+    .Cards__count {
+        color: var(--gold);
+        font-family: var(--font-pixel);
+        font-size: 11px;
+        line-height: 1.5;
+    }
+
+    .Cards__deck {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px;
+        background:
+            linear-gradient(rgb(30 31 34 / 88%), rgb(30 31 34 / 88%)),
+            url("/assets/tiles/obsidian.png") 0 0 / 48px 48px;
+    }
+
+    .Cards__slots {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+
+        > .GameCard { animation: cards-deal 520ms var(--ease-out) backwards; }
+
+        @for $index from 1 through 7 {
+            > :nth-child(#{$index}) { animation-delay: #{($index - 1) * 70}ms; }
+        }
+    }
+
+    .Cards__slot {
+        display: flex;
+        aspect-ratio: 5 / 7;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        border: 2px dashed var(--surface-4);
+        background: rgb(0 0 0 / 30%);
+        color: var(--text-faint);
+        font-family: var(--font-pixel);
+        font-size: 18px;
+        transition: background-color 200ms linear, color 200ms linear;
+
+        @media (hover: hover) {
+            &:hover { background: rgb(255 255 255 / 6%); color: var(--text); }
+        }
+
+        &--locked {
+            border-style: solid;
+            border-color: var(--outline);
+            background: rgb(0 0 0 / 45%);
+
+            img {
+                width: 46%;
+                opacity: .55;
+            }
+
+            small {
+                color: var(--xp);
+                font-size: 9px;
+            }
+        }
+    }
+
+    .Cards__bonus {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        list-style: none;
+
+        li {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            border: 2px solid var(--outline);
+            background: var(--surface-1);
+            color: var(--text-faint);
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        img, .mc-coin {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 18px;
+            object-fit: contain;
+        }
+
+        .Cards__bonus-text {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        strong {
+            font-family: var(--font-pixel);
+            font-size: 10px;
+            font-weight: 400;
+            line-height: 1.3;
+            white-space: nowrap;
+        }
+
+        .Cards__bonus-text span { min-width: 0; hyphens: auto; overflow-wrap: break-word; }
+
+        .Cards__bonus--on {
+            color: var(--text);
+
+            strong { color: var(--xp); }
+        }
+    }
+
+    .Cards__combos {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .Cards__combo {
+        display: flex;
+        min-width: 0;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 8px;
+        opacity: .72;
+        transition: opacity 400ms linear, background-color 400ms linear;
+
+        h3 {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 2px 6px;
+            font-size: 13px;
+        }
+
+        em {
+            color: var(--gold);
+            font-size: 11px;
+            font-style: normal;
+            font-weight: 800;
+        }
+
+        p {
+            margin-top: 2px;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        &--active {
+            background: #3a3420;
+            opacity: 1;
+            outline: 2px solid var(--gold);
+            outline-offset: -2px;
+
+            .Cards__combo-icon img { animation: mc-bob 1800ms steps(8) infinite; }
+        }
+    }
+
+    .Cards__combo-icon {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        place-items: center;
+        border: 2px solid var(--outline);
+        background: var(--slot);
+        box-shadow: inset 2px 2px 0 var(--slot-shade), inset -2px -2px 0 var(--slot-light);
+
+        img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+    }
+
+    .Cards__album {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        scroll-margin-top: calc(var(--header-height) + var(--safe-top) + 8px);
+    }
+
+    .Cards__note {
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.35;
+
+        strong { color: var(--xp); }
+    }
+
+    .Cards__filters {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .Cards__filter {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        padding: 6px 2px 5px;
+        border: 2px solid var(--outline);
+        background: var(--surface-1);
+        color: var(--text-faint);
+        transition: background-color 200ms linear, color 200ms linear;
+
+        img {
+            width: 26px;
+            height: 26px;
+            object-fit: contain;
+        }
+
+        small {
+            font-family: var(--font-pixel);
+            font-size: 8px;
+            line-height: 1.4;
+        }
+
+        &--active {
+            background: var(--green);
+            box-shadow: inset 0 2px 0 var(--green-hi), inset 0 -3px 0 var(--green-lo);
+            color: var(--text);
+
+            img { animation: mc-bob 1800ms steps(8) infinite; }
+        }
+    }
+
+    .Cards__location {
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+
+    .Cards__grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .Cards__cell {
+        min-width: 0;
+        animation: cards-deal 560ms var(--ease-out) backwards;
+    }
+}
+
+// Деталі карти живуть у шторці, тому стилі не прив'язані до сторінки
+.Cards__details {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding-bottom: 4px;
+
+    .Cards__details-card {
+        width: min(54%, 200px);
+        align-self: center;
+        perspective: 800px;
+
+        .GameCard { animation: cards-reveal 900ms var(--ease-out) backwards; }
+    }
+
+    .Cards__details-tags {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .Cards__tag,
+    .Cards__rarity {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 8px;
+        border: 2px solid var(--outline);
+        background: var(--surface-1);
+        font-size: 12px;
+        font-weight: 800;
+
+        img {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+        }
+    }
+
+    .Cards__rarity {
+        &--common { color: #d6d6d6; }
+        &--rare { color: #8fb6ff; }
+        &--epic { color: #d3a4ff; }
+        &--legendary { color: var(--gold); }
+    }
+
+    .Cards__progress {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+
+        span {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+        }
+    }
+
+    .Cards__hint {
+        color: var(--text-muted);
+        font-size: 13px;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .Cards__effects {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        list-style: none;
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border: 2px solid var(--outline);
+            background: var(--surface-1);
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        img {
+            width: 22px;
+            height: 22px;
+            flex: 0 0 22px;
+            object-fit: contain;
+        }
+
+        .Cards__effects-head {
+            padding: 0;
+            border: 0;
+            background: none;
+            color: var(--text-faint);
+            font-size: 12px;
+        }
+    }
+}
+
+// Карта лягає на стіл: повільно, з вагою, як предмет у Minecraft
+@keyframes cards-deal {
+    0% { opacity: 0; transform: translateY(18px) rotate(-4deg) scale(.92); }
+    60% { opacity: 1; }
+    100% { opacity: 1; transform: none; }
+}
+
+@keyframes cards-reveal {
+    0% { opacity: 0; transform: rotateY(-180deg) scale(.8); }
+    55% { opacity: 1; }
+    100% { opacity: 1; transform: rotateY(0) scale(1); }
+}
+
+@media (max-width: 360px) {
+    #Cards .Cards__combos { grid-template-columns: minmax(0, 1fr); }
+}

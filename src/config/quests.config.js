@@ -18,6 +18,7 @@ const QUEST_METRICS = {
     level: { text: "Досягти рівня: {count}", icon: "/items/experience_bottle.png" },
     blocks: { text: "Мати блоків: {count}", icon: "/items/grass_block.png" },
     stations: { text: "Купити верстаків: {count}", icon: "/items/anvil.png" },
+    cards: { text: "Зібрати різних карт: {count}", icon: "/items/item_frame.png" },
 }
 
 // Локації в порядку спуску: сервер надсилає лише їхні ідентифікатори

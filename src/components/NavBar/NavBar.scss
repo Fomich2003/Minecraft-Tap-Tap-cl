@@ -15,9 +15,9 @@
     &__wrapper {
         display: grid;
         height: calc(var(--navbar-height) - 2px);
-        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-template-columns: repeat(7, minmax(0, 1fr));
         align-items: center;
-        padding: 0 4px;
+        padding: 0 2px;
     }
 
     &__link {
@@ -51,8 +51,8 @@
     &__slot {
         position: relative;
         display: grid;
-        width: 42px;
-        height: 42px;
+        width: 40px;
+        height: 40px;
         place-items: center;
         border: 2px solid var(--outline);
         background: var(--slot);
@@ -86,7 +86,7 @@
     &__label {
         max-width: 100%;
         overflow: hidden;
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 700;
         line-height: 1.1;
         text-overflow: ellipsis;

@@ -10,6 +10,7 @@ import Tap from "./pages/Tap/Tap"
 import Inventory from "./pages/Inventory/Inventory"
 import Quests from "./pages/Quests/Quests"
 import Top from "./pages/Top/Top"
+import Cards from "./pages/Cards/Cards"
 import LanguageSheet from "./components/LanguageSheet/LanguageSheet"
 import { t, useLanguage } from "./i18n"
 
@@ -33,6 +34,7 @@ function App() {
           <Route path="/game" element={<Tap />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/quests" element={<Quests />} />
+          <Route path="/cards" element={<Cards />} />
           <Route path="/top" element={<Top />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

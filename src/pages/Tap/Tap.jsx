@@ -15,6 +15,7 @@ import { gameName, itemName, t } from "../../i18n"
 import { BossAction, BossTimer } from "./BossParts"
 import WorldScene from "./WorldScene"
 import EffectBadges from "./EffectBadges"
+import CardReveal from "../../components/CardReveal/CardReveal"
 import EquipmentSheet from "./EquipmentSheet"
 import UpgradeSheet from "./UpgradeSheet"
 import useTapQueue from "./useTapQueue"
@@ -86,21 +87,29 @@ function Tap() {
     const [upgrading, setUpgrading] = useState(false)
     const [upgradeMessage, setUpgradeMessage] = useState("")
     const [levelUp, setLevelUp] = useState(null)
+    const [revealed, setRevealed] = useState(null)
 
     const fxLayer = useRef(null)
     const lastHit = useRef(0)
     const blockArt = useRef(null)
     const nextDropId = useRef(0)
     const timers = useRef(new Set())
+    const tapCoinsRef = useRef(0)
 
     const activeBlock = userBlocks.find(block => block._id === selectedBlockId) ?? userBlocks[0] ?? null
     const { level, cost } = user.upgrade
-    const { coinsPerTap, effects, tools, blocks, damage, experience } = user.loadout
+    const { effects, tools, blocks, damage, experience, coinsBySlug } = user.loadout
     const upgradeReady = user.balance >= cost
     const activeMob = selectedMob ? mobs?.find(mob => mob.slug === selectedMob && (mob.boss ? mob.boss.active : mob.owned)) ?? null : null
     const blockLoadout = !activeMob && activeBlock ? blocks[activeBlock.slug] : null
     const tool = activeMob ? tools.sword : blockLoadout ? tools[blockLoadout.kind] : null
     const power = activeMob ? Math.min(activeMob.hp, damage) : blockLoadout?.power ?? 1
+    // Карта цілі в колоді робить тап по ній дорожчим
+    const coinsPerTap = coinsBySlug?.[activeMob?.slug ?? activeBlock?.slug] ?? user.loadout.coinsPerTap
+
+    useEffect(() => {
+        tapCoinsRef.current = coinsPerTap
+    }, [coinsPerTap])
 
     // Блок і моб для тапу однакові: ключ черги, іконка, назва й скільки ударів витримує
     const target = activeMob
@@ -151,7 +160,7 @@ function Tap() {
         onSuccess: (result, pendingTaps) => {
             setUser(prev => ({
                 ...prev,
-                balance: result.user.balance + pendingTaps * prev.loadout.coinsPerTap,
+                balance: result.user.balance + pendingTaps * tapCoinsRef.current,
                 tapProgress: result.user.tapProgress,
                 loadout: result.loadout,
                 questsReady: result.questsReady,
@@ -160,6 +169,10 @@ function Tap() {
             if (!pendingTaps) setProgress(prev => ({ ...prev, ...result.user.tapProgress }))
             if (result.drops?.length) showDrops(result.drops)
             else if (result.missed) addDropToasts([{ id: nextDropId.current++, missed: true }])
+            if (result.card) {
+                setRevealed({ ...result.card, id: nextDropId.current++ })
+                haptic("success")
+            }
             if (result.toolBroken) {
                 showDrops([{ slug: result.toolBroken }], true)
                 haptic("error")
@@ -518,6 +531,8 @@ function Tap() {
                     <span>{t("+{amount} за тап на всіх блоках", { amount: levelUp.coinsPerTap })}</span>
                 </div>
             )}
+
+            {revealed && <CardReveal key={revealed.id} card={revealed} side onDone={() => setRevealed(null)} />}
 
             {bossWin && (
                 <div className="Tap__levelup" role="status">

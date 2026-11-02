@@ -9,6 +9,7 @@ import { haptic } from "../../utils/telegram"
 import ServerImage from "../../components/ServerImage/ServerImage"
 import Banner from "../../components/Banner/Banner"
 import ReferralCard from "./ReferralCard"
+import CardReveal from "../../components/CardReveal/CardReveal"
 import { gameName, itemName, t } from "../../i18n"
 
 function Avatar({ photo, name }) {
@@ -43,6 +44,7 @@ function Profile() {
     const [message, setMessage] = useState("")
     const [reward, setReward] = useState(0)
     const [loot, setLoot] = useState([])
+    const [dailyCard, setDailyCard] = useState(null)
 
     useEffect(() => {
         const interval = setInterval(() => setNow(Date.now()), 1000)
@@ -79,6 +81,7 @@ function Profile() {
         if (result.success) {
             setReward(result.user.balance - before)
             setLoot(result.loot ?? [])
+            setDailyCard(result.card ?? null)
             haptic("success")
         } else {
             setMessage(result.message)
@@ -158,6 +161,8 @@ function Profile() {
                 </div>}
                 {reward > 0 && <span className="Profile__reward" key={reward} onAnimationEnd={() => setReward(0)}>+{formatNumber(reward)}</span>}
             </section>
+
+            {dailyCard && <CardReveal card={dailyCard} onDone={() => setDailyCard(null)} />}
 
             <ReferralCard />
 

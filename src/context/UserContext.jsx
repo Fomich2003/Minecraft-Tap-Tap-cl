@@ -5,6 +5,7 @@ import inventoryService from "../services/inventory.service"
 import stationService from "../services/station.service"
 import questService from "../services/quest.service"
 import mobService from "../services/mob.service"
+import cardService from "../services/card.service"
 import { CLIENT_CONF } from "../config/api.config"
 import { setupTelegram } from "../utils/telegram"
 import { changeLanguage, hasChosenLanguage, t } from "../i18n"
@@ -194,6 +195,15 @@ const UserProvider = ({ children }) => {
 
     const loadLeaderboard = metric => userService.leaderboard(telegramData, metric)
 
+    // Колода змінює монети й шанси дропа, тому після неї профіль перечитується
+    const loadCards = () => cardService.list(telegramData)
+
+    const saveDeck = async deck => {
+        const result = await cardService.setDeck(telegramData, deck)
+        if (result.success) await syncProfile()
+        return result
+    }
+
     return (
         <UserContext.Provider value={{
             user,
@@ -232,7 +242,9 @@ const UserProvider = ({ children }) => {
             loadQuests,
             claimQuest,
             saveLanguage,
-            loadLeaderboard
+            loadLeaderboard,
+            loadCards,
+            saveDeck
         }}>
             {children}
         </UserContext.Provider>
