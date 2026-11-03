@@ -1,9 +1,10 @@
 import "./Inventory.scss"
+import "./Bench.scss"
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { useUserContext } from "../../context/UserContext"
 import ServerImage from "../../components/ServerImage/ServerImage"
 import { INVENTORY_CONF } from "../../config/inventory.config"
-import { STATION_LAYOUTS } from "../../config/stations.config"
+import { STATION_LAYOUTS, stationFace } from "../../config/stations.config"
 import { EFFECTS } from "../../config/effects.config"
 import { formatLeft } from "../Tap/useCountdown"
 import { formatNumber } from "../../utils/format"
@@ -15,6 +16,7 @@ import { itemName, t } from "../../i18n"
 import { addToSlot, clearSlot, identityOf, moveBetweenSlots, reconcilePlacement, remainingByStack, spendFromSlots } from "../../utils/placement"
 import StationPanel from "./StationPanel"
 import JobPanel from "./JobPanel"
+import CartographyPanel from "./CartographyPanel"
 import StationsSheet from "./StationsSheet"
 import ShopSheet from "./ShopSheet"
 import RecipeSheet from "./RecipeSheet"
@@ -318,7 +320,7 @@ function Inventory() {
     }
     const equipped = new Set(Object.values(user.loadout.tools).map(tool => tool?.stackId))
     const onApplied = used => setPlaced(current => (used ? spendFromSlots(current, used) : NO_SLOTS))
-    const Panel = layout.timed ? JobPanel : StationPanel
+    const Panel = station.uiType === "cartography" ? CartographyPanel : layout.timed ? JobPanel : StationPanel
     const recipeStations = { grid: "crafting_table", brewing: "brewing_stand" }
 
     return <main id="Inventory" className="Inventory" onClickCapture={drag.suppressClickAfterDrag}>
@@ -333,7 +335,10 @@ function Inventory() {
                     <button className="mc-btn mc-btn--small" disabled={isBusy} aria-label={t("Скласти стаки")} onClick={sortStacks}>{t("Стаки")}</button>
                     <button className="mc-btn mc-btn--small mc-btn--green" onClick={() => setSheet("shop")}>{t("Магазин")}</button>
                 </div>
-                <Panel key={station.slug} station={station} placed={placed} dragOver={drag.over} handlers={handlers} onApplied={onApplied} />
+                {/* Смуга з текстурою блока верстака: з першого погляду видно, за яким столом стоїш */}
+                <div className={`Inventory__bench Inventory__bench--${station.uiType}`} style={{ "--bench-face": `url(${stationFace(station.slug)})` }}>
+                    <Panel key={station.slug} station={station} placed={placed} dragOver={drag.over} handlers={handlers} onApplied={onApplied} />
+                </div>
             </section>
 
             <section className="Inventory__items" aria-label={t("Інвентар")}>

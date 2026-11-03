@@ -1,0 +1,468 @@
+// Верстак у світлому сірому інтерфейсі гри: рамка з відблиском і тінню, а згори смуга з текстурою самого блока
+#Inventory .Inventory__bench {
+    --gui: #c6c6c6;
+    --gui-hi: #ffffff;
+    --gui-lo: #555555;
+    --gui-text: #3f3f3f;
+
+    position: relative;
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px 8px 8px;
+    border: 3px solid var(--outline);
+    background: var(--gui);
+    box-shadow: inset 3px 3px 0 var(--gui-hi), inset -3px -3px 0 var(--gui-lo);
+    color: var(--gui-text);
+    image-rendering: pixelated;
+    animation: bench-in 420ms var(--ease-out) backwards;
+
+    &::before {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        height: 14px;
+        border-bottom: 2px solid var(--outline);
+        background: var(--bench-face) 0 50% / 28px 28px repeat-x;
+        box-shadow: inset 0 -3px 0 rgb(0 0 0 / 22%);
+        content: "";
+    }
+
+    .Inventory__craft-layout {
+        padding: 2px;
+        border: 0;
+        background: none;
+        box-shadow: none;
+    }
+
+    .Inventory__hint { color: var(--gui-text); }
+    .Inventory__message { color: #a3160d; }
+    .Inventory__shelves { color: var(--gui-text); }
+
+    .Inventory__job {
+        border: 0;
+        background: none;
+        box-shadow: none;
+        color: var(--gui-text);
+    }
+}
+
+// Стрілка процесу зі спрайта печі: сіра, доки нічого не виходить, біла й пульсує, коли результат готовий
+#Inventory .Inventory__craft-arrow {
+    display: block;
+    width: 36px;
+    height: 26px;
+    flex: 0 0 auto;
+    background: #8b8b8b;
+    // Ступінчаста стрілка, як у печі гри
+    clip-path: polygon(0 36%, 54% 36%, 54% 18%, 66% 18%, 66% 30%, 78% 30%, 78% 42%, 90% 42%, 100% 50%, 90% 58%, 78% 58%, 78% 70%, 66% 70%, 66% 82%, 54% 82%, 54% 64%, 0 64%);
+
+    &--ready {
+        background: #fff;
+        animation: bench-blink 1.2s steps(4) infinite;
+    }
+}
+
+#Inventory .Inventory__flame {
+    display: block;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 auto;
+    margin: -2px auto;
+    background: #8b8b8b;
+    // Ступінчасте полум'я: спрайт гри непрозорий і як маска дає квадрат
+    clip-path: polygon(43% 0, 57% 0, 57% 14%, 71% 14%, 71% 36%, 86% 36%, 86% 57%, 100% 57%, 100% 100%, 0 100%, 0 57%, 14% 57%, 14% 29%, 29% 29%, 29% 14%, 43% 14%);
+
+    &--lit { background: linear-gradient(180deg, #fff3a0, #ffb21c 45%, #e2430e); }
+
+    &--burning {
+        width: 32px;
+        height: 32px;
+        margin: 0;
+        animation: bench-flame 700ms steps(3) infinite;
+    }
+}
+
+// Розкладки слотів за інтерфейсами гри
+#Inventory .Inventory__station-slots--column,
+#Inventory .Inventory__station-slots--furnace {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 4px;
+}
+
+#Inventory .Inventory__station-slots--plus {
+    gap: 26px;
+
+    .Inventory__craft-slot + .Inventory__craft-slot::before {
+        position: absolute;
+        left: -22px;
+        color: #3f3f3f;
+        content: "+";
+        font-family: var(--font-pixel);
+        font-size: 14px;
+    }
+}
+
+// Вибір локації для нової мапи
+#Inventory .Inventory__locations {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px;
+}
+
+#Inventory .Inventory__location {
+    display: flex;
+    min-width: 0;
+    min-height: 54px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 3px 2px;
+    border: 2px solid var(--outline);
+    background: var(--slot);
+    box-shadow: inset 2px 2px 0 var(--slot-shade), inset -2px -2px 0 var(--slot-light);
+    color: #1e1e1f;
+    transition: transform 90ms var(--ease-pop);
+
+    img {
+        width: 26px;
+        height: 26px;
+        object-fit: contain;
+    }
+
+    span {
+        max-width: 100%;
+        overflow: hidden;
+        font-size: 10px;
+        font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &:active:not(:disabled) { transform: scale(.95); }
+
+    &:disabled {
+        filter: grayscale(.8);
+        opacity: .55;
+    }
+
+    &--active {
+        background: #b7a24c;
+        outline: 2px solid var(--gold);
+        outline-offset: -2px;
+    }
+}
+
+// Похід розвідника: мапа ліворуч, стан і кнопки праворуч
+#Inventory .Expedition {
+    display: grid;
+    grid-template-columns: minmax(118px, 44%) minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+
+    &--ready .Expedition__marker { animation: bench-blink .8s steps(2) infinite; }
+}
+
+#Inventory .Expedition__map {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    filter: drop-shadow(0 3px 0 rgb(0 0 0 / 30%));
+
+    canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        image-rendering: pixelated;
+    }
+}
+
+#Inventory .Expedition__marker {
+    position: absolute;
+    width: 9%;
+    height: 9%;
+    image-rendering: pixelated;
+    transform: translate(-50%, -50%);
+    transition: left 1s linear, top 1s linear;
+}
+
+#Inventory .Expedition__info {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 700;
+
+    strong {
+        font-size: 15px;
+        font-weight: 800;
+    }
+}
+
+#Inventory .Expedition__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    .mc-btn { flex: 1 1 auto; }
+}
+
+// Опис походу на пергаменті: що обіцяє покладена мапа
+#Inventory .Expedition__plan {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    align-items: center;
+    gap: 4px 8px;
+    padding: 6px;
+    border: 2px solid var(--outline);
+    background: #e4d6a8;
+    box-shadow: inset 2px 2px 0 #fff4cf, inset -2px -2px 0 #a8946a;
+    color: #3b2a12;
+    animation: mc-rise 260ms var(--ease-out) backwards;
+
+    img {
+        width: 34px;
+        height: 34px;
+        object-fit: contain;
+    }
+
+    div {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        font-size: 11px;
+        font-weight: 700;
+
+        strong {
+            font-size: 13px;
+            font-weight: 800;
+        }
+    }
+
+    .mc-btn { grid-column: 1 / -1; }
+}
+
+#Inventory .Expedition__loot {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    text-align: center;
+
+    strong {
+        font-size: 14px;
+        font-weight: 800;
+    }
+}
+
+#Inventory .Expedition__finds {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+}
+
+#Inventory .Expedition__find {
+    position: relative;
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border: 2px solid var(--outline);
+    background: var(--slot);
+    box-shadow: inset 2px 2px 0 var(--slot-shade), inset -2px -2px 0 var(--slot-light);
+    animation: mc-pop 260ms var(--ease-pop) backwards;
+
+    img {
+        width: 76%;
+        height: 76%;
+        object-fit: contain;
+    }
+
+    b {
+        position: absolute;
+        right: 2px;
+        bottom: 1px;
+        color: #fff;
+        font-family: var(--font-pixel);
+        font-size: 9px;
+        font-weight: 400;
+        text-shadow: 1px 1px 0 #000;
+    }
+
+    &--treasure {
+        background: #b7a24c;
+        outline: 2px solid var(--gold);
+        outline-offset: -2px;
+    }
+}
+
+#Inventory .Expedition__line {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 12px;
+    font-size: 12px;
+    font-weight: 800;
+
+    em {
+        color: #8a6100;
+        font-style: normal;
+    }
+}
+
+#Inventory .Expedition__empty { font-size: 12px; }
+
+// Шторка верстаків: дві колонки карток, у кожній блок верстака на тлі його ж текстури
+.Stations__count {
+    margin: -4px 0 8px;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.Stations {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.Stations__card {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 8px 10px;
+    border: 3px solid var(--outline);
+    background: #c6c6c6;
+    box-shadow: inset 3px 3px 0 #fff, inset -3px -3px 0 #555;
+    color: #3f3f3f;
+    text-align: center;
+    cursor: pointer;
+    animation: mc-rise 300ms var(--ease-out) backwards;
+    transition: transform 100ms var(--ease-pop);
+
+    &:active { transform: scale(.98); }
+
+    &--active {
+        background: #a9d99a;
+        box-shadow: inset 3px 3px 0 #e2ffd6, inset -3px -3px 0 #2f6b22, 0 0 0 3px var(--xp);
+    }
+
+    &--locked {
+        cursor: default;
+
+        .Stations__block { filter: grayscale(.7) brightness(.85); }
+    }
+}
+
+// Блок верстака: текстура його грані плиткою, зверху іконка предмета
+.Stations__block {
+    display: grid;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 2px;
+    place-items: center;
+    border: 3px solid var(--outline);
+    background: var(--face) 0 0 / 100% 100%;
+    box-shadow: inset 0 0 0 2px rgb(255 255 255 / 18%), 0 4px 0 rgb(0 0 0 / 30%);
+    image-rendering: pixelated;
+
+    img {
+        width: 44px;
+        height: 44px;
+        object-fit: contain;
+        filter: drop-shadow(0 3px 0 rgb(0 0 0 / 45%));
+    }
+}
+
+.Stations__name {
+    max-width: 100%;
+    overflow: hidden;
+    color: #202020;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.Stations__info {
+    min-height: 2.5em;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.Stations__state {
+    margin-top: 2px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.Stations__card--active .Stations__state { color: #1d4d13; }
+
+.Stations__price {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #3f3f3f;
+    font-family: var(--font-pixel);
+    font-size: 10px;
+
+    svg, img {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.Stations__progress {
+    display: block;
+    width: 100%;
+    height: 6px;
+    border: 2px solid var(--outline);
+    background: #555;
+
+    i {
+        display: block;
+        height: 100%;
+        background: var(--gold-face);
+    }
+}
+
+.Stations__buy {
+    width: 100%;
+    margin-top: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .Stations__card { animation: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #Inventory .Inventory__bench,
+    #Inventory .Inventory__craft-arrow--ready,
+    #Inventory .Inventory__flame--burning { animation: none; }
+}
+
+@keyframes bench-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes bench-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .55; }
+}
+
+@keyframes bench-flame {
+    0%, 100% { scale: 1 1; }
+    50% { scale: 1.06 .9; }
+}

@@ -257,6 +257,30 @@
         }
     }
 
+    // Годинник із гри: кадр стрічки відповідає положенню сонця над регіоном гравця
+    .Tap__sky {
+        position: absolute;
+        z-index: 6;
+        top: calc(100% + 8px);
+        inset-inline-start: -2px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 6px 3px 4px;
+        border: 2px solid var(--outline);
+        background: rgb(30 31 34 / 86%);
+        font-family: var(--font-pixel);
+        font-size: 9px;
+        pointer-events: none;
+    }
+
+    .Tap__clock {
+        width: 24px;
+        height: 24px;
+        background: url("/assets/world/clock_strip.png") 0 0 / 100% 6400% no-repeat;
+        image-rendering: pixelated;
+    }
+
     // Інструмент і ефекти стоять окремим стовпчиком, щоб не зсувати блок при появі
     .Tap__status {
         position: absolute;

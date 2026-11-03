@@ -1,6 +1,6 @@
 import "./WorldScene.scss"
 import { useEffect, useRef, useState } from "react"
-import { FLOOR, STOPS, loadWorld } from "./worldMap"
+import { FLOOR, STOPS, SURFACE_ROWS, loadWorld } from "./worldMap"
 
 // Одна клітинка карти на екрані: карта вдвічі більша за свої текстури
 const BLOCK_PX = 32
@@ -15,8 +15,6 @@ const spots = (count, step, shift = 0) => Array.from({ length: count }, (_, inde
 
 const cell = (column, row) => ({ left: column * BLOCK_PX, top: row * BLOCK_PX })
 
-const CLOUDS = [{ top: 130, delay: "-18s", speed: "78s", scale: 1 }, { top: 205, delay: "-52s", speed: "120s", scale: .7 }, { top: 268, delay: "-66s", speed: "96s", scale: .85 }]
-
 function Flames({ torches, stop }) {
     return torches.map(torch => <i key={`${torch.x}-${torch.y}`} className="World__flame" style={cell(torch.x, torch.y - stop)} />)
 }
@@ -26,14 +24,71 @@ const SPLASHES = [{ left: 482, delay: "0s" }, { left: 494, delay: "-.5s" }, { le
 const POOL_BUBBLES = [{ left: 470, delay: "-1s" }, { left: 512, delay: "-2.4s" }, { left: 548, delay: "-3.7s" }]
 const LAVA_BUBBLES = [{ left: 150, delay: "-.6s" }, { left: 262, delay: "-2.1s" }, { left: 372, delay: "-3.2s" }, { left: 500, delay: "-1.4s" }]
 
+// Небо лежить вище карти: його нуль на 600 пікселів над першим рядком
+const HEAVEN_TOP = 600
+const HORIZON = HEAVEN_TOP + 395
+const ZENITH = HEAVEN_TOP + 245
+const ARC = { from: 150, to: 490 }
+const STARS = Array.from({ length: 64 }, (_, index) => {
+    const random = seed => {
+        const value = Math.sin(index * 91.7 + seed * 47.3) * 43758.5453
+        return value - Math.floor(value)
+    }
+    return { left: Math.round(random(1) * 640), top: Math.round(HEAVEN_TOP - 120 + random(2) * 470), size: random(3) > .82 ? 3 : 2, delay: `${-random(4) * 6}s` }
+})
+// Перша смуга далека: нижче, менша й повільніша, друга пливе ближче до камери
+const CLOUD_LAYERS = [{ top: HEAVEN_TOP + 300, speed: 900, opacity: .72, scale: .55 }, { top: HEAVEN_TOP + 196, speed: 520, opacity: .95 }]
+
+// Світило йде дугою: сходить ліворуч за пагорбами й сідає праворуч
+function arcPosition(progress) {
+    return { left: ARC.from + (ARC.to - ARC.from) * progress, top: HORIZON - (HORIZON - ZENITH) * Math.sin(Math.PI * progress) }
+}
+
+function Heavens({ sky, clouds, awake }) {
+    const body = arcPosition(sky.progress)
+    const glow = { left: sky.isDay ? body.left : sky.progress < .5 ? ARC.to : ARC.from }
+    return (
+        <div className={`World__sky${awake ? "" : " World__sky--asleep"}`}>
+            <i className="World__sky-layer World__sky-layer--day" style={{ opacity: sky.daylight }} />
+            <i className="World__sky-layer World__sky-layer--dusk" style={{ opacity: sky.dusk }} />
+            <i className="World__sky-layer World__sky-layer--storm" style={{ opacity: sky.weather === "clear" ? 0 : .55 + sky.daylight * .3 }} />
+            <i className="World__horizon-glow" style={{ left: glow.left, opacity: sky.dusk }} />
+            <div className="World__stars" style={{ opacity: sky.stars }}>
+                {STARS.map((star, index) => <i key={index} style={{ left: star.left, top: star.top, width: star.size, height: star.size, animationDelay: star.delay }} />)}
+            </div>
+            <span className={`World__celestial World__celestial--${sky.isDay ? "sun" : "moon"}`}
+                style={{ transform: `translate(${body.left - 64}px, ${body.top - 64}px)`, backgroundImage: sky.isDay ? undefined : `url(/assets/world/moon_${sky.moon}.png)`, opacity: sky.weather === "clear" ? 1 : .35 }} />
+            {clouds.map((strip, index) => {
+                const layer = CLOUD_LAYERS[index]
+                return <span key={index} className="World__clouds" style={{
+                    top: layer.top, height: strip.height * (layer.scale ?? 1), opacity: layer.opacity,
+                    "--cloud-width": `${strip.width * (layer.scale ?? 1)}px`, animationDuration: `${layer.speed}s`,
+                }}>
+                    <i style={{ backgroundColor: sky.cloud, maskImage: `url(${strip.url})`, WebkitMaskImage: `url(${strip.url})` }} />
+                </span>
+            })}
+        </div>
+    )
+}
+
+const FIREFLIES = Array.from({ length: 12 }, (_, index) => ({ left: 90 + (index * 47) % 470, top: 360 + (index * 37) % 110, delay: `${-(index * 1.9) % 7}s`, speed: `${6 + (index * 1.3) % 5}s` }))
+
 // Живі деталі кожної локації: малюються лише там, де стоїть камера
-function SurfaceLife() {
+function SurfaceLife({ sky }) {
+    const calm = sky.weather === "clear"
+    const day = calm ? sky.daylight : 0
     return <>
-        <span className="World__sun" />
-        {CLOUDS.map(cloud => <span key={cloud.top} className="World__cloud" style={{ top: cloud.top, animationDelay: cloud.delay, animationDuration: cloud.speed, scale: cloud.scale }} />)}
-        {spots(3, 31, 12).map(spot => <i key={spot.left} className="World__bird" style={{ top: 170 + parseFloat(spot.left), animationDelay: spot.delay }} />)}
-        {[...spots(4, 6, 16), ...spots(4, 6, 61)].map(spot => <i key={spot.left} className="World__leaf" style={{ left: spot.left, animationDelay: spot.delay, animationDuration: spot.duration }} />)}
-        {BUTTERFLIES.map(fly => <i key={fly.top} className="World__butterfly" style={{ top: fly.top, color: fly.color, animationDelay: `${fly.delay}, 0s`, animationDuration: `${fly.speed}, .32s` }} />)}
+        <div className="World__daylife" style={{ opacity: day }}>
+            {spots(3, 31, 12).map(spot => <i key={spot.left} className="World__bird" style={{ top: 170 + parseFloat(spot.left), animationDelay: spot.delay }} />)}
+            {BUTTERFLIES.map(fly => <i key={fly.top} className="World__butterfly" style={{ top: fly.top, color: fly.color, animationDelay: `${fly.delay}, 0s`, animationDuration: `${fly.speed}, .32s` }} />)}
+        </div>
+        <div className="World__daylife" style={{ opacity: .3 + sky.daylight * .7 }}>
+            {[...spots(4, 6, 16), ...spots(4, 6, 61)].map(spot => <i key={spot.left} className="World__leaf" style={{ left: spot.left, animationDelay: spot.delay, animationDuration: spot.duration }} />)}
+        </div>
+        <div className="World__nightlife" style={{ opacity: calm ? 1 - sky.daylight : 0 }}>
+            {FIREFLIES.map((fly, index) => <i key={index} className="World__firefly" style={{ left: fly.left, top: fly.top, animationDelay: `${fly.delay}, ${fly.delay}`, animationDuration: `${fly.speed}, 2.4s` }} />)}
+        </div>
+        {!calm && <div className={`World__weather World__weather--${sky.weather}`}><i /></div>}
     </>
 }
 
@@ -100,9 +155,10 @@ function EndLife() {
 
 const LIFE = [SurfaceLife, CavesLife, DepthsLife, NetherLife, EndLife]
 
-function WorldScene({ depth, ready, label }) {
+function WorldScene({ depth, ready, label, sky, skyLabel }) {
     const holder = useRef(null)
     const [torches, setTorches] = useState([])
+    const [art, setArt] = useState({ mask: null, clouds: [] })
     const [flight, setFlight] = useState({ depth, ready, from: depth, ms: 0 })
 
     // Тривалість залежить від відстані: перехід через весь світ має бути справжнім спуском
@@ -125,23 +181,26 @@ function WorldScene({ depth, ready, label }) {
             if (cancelled || !holder.current) return
             holder.current.replaceChildren(world.canvas)
             setTorches(world.torches)
+            setArt({ mask: world.mask, clouds: world.clouds })
         })
         return () => { cancelled = true }
     }, [])
 
     const stop = STOPS[depth]
     const torchesOf = index => torches.filter(torch => torch.y >= STOPS[index] && torch.y < (STOPS[index + 1] ?? Infinity))
+    const onSurface = depth === 0 || flight.from === 0
 
     return (
         <div className={`World${depth ? " World--deep" : ""}`} aria-hidden="true">
             <div className="World__anchor">
                 <div className="World__camera" style={{ transform: `translateY(${-(stop + FLOOR) * BLOCK_PX}px)`, transitionDuration: `${flight.ms}ms` }}>
-                    <div className="World__sky" />
+                    <Heavens sky={sky} clouds={art.clouds} awake={onSurface} />
                     <div className="World__holder" ref={holder} />
+                    {art.mask && <i className="World__shade" style={{ height: SURFACE_ROWS * BLOCK_PX, opacity: sky.shade, maskImage: `url(${art.mask}), linear-gradient(#000 62%, transparent)`, WebkitMaskImage: `url(${art.mask}), linear-gradient(#000 62%, transparent)` }} />}
                     {[...new Set([flight.from, depth])].map(index => {
                         const Life = LIFE[index]
                         return <div className="World__life" key={index} style={{ top: STOPS[index] * BLOCK_PX, animationDelay: index === depth ? `${flight.ms}ms` : "0ms" }}>
-                            <Life torches={torchesOf(index)} />
+                            <Life torches={torchesOf(index)} sky={sky} />
                         </div>
                     })}
                 </div>
@@ -149,7 +208,10 @@ function WorldScene({ depth, ready, label }) {
             {flying && <div className={`World__streaks${flight.from > depth ? " World__streaks--up" : ""}`}>
                 {spots(11, 9, 4).map(spot => <i key={spot.left} style={{ left: spot.left, animationDelay: spot.delay, animationDuration: `${parseFloat(spot.duration) / 6}s` }} />)}
             </div>}
-            <span className="World__place" key={`place-${depth}`} style={{ animationDelay: `${flight.ms * .7}ms` }}>{label}</span>
+            <span className="World__place" key={`place-${depth}`} style={{ animationDelay: `${flight.ms * .7}ms` }}>
+                {label}
+                {depth === 0 && skyLabel && <small>{skyLabel}</small>}
+            </span>
         </div>
     )
 }

@@ -13,7 +13,7 @@ import particles, { navTarget } from "../../utils/particles"
 import { critPower, isCritical } from "../../utils/critical"
 import { EFFECTS } from "../../config/effects.config"
 import { LOCATION_NAMES } from "../../config/quests.config"
-import { gameName, itemName, t } from "../../i18n"
+import { gameName, getLanguage, itemName, t } from "../../i18n"
 import { BossAction, BossTimer } from "./BossParts"
 import WorldScene from "./WorldScene"
 import EffectBadges from "./EffectBadges"
@@ -21,11 +21,25 @@ import CardReveal from "../../components/CardReveal/CardReveal"
 import EquipmentSheet from "./EquipmentSheet"
 import UpgradeSheet from "./UpgradeSheet"
 import useTapQueue from "./useTapQueue"
+import { useSky } from "../../utils/sky"
 
 const ACTIVE_BLOCK_KEY = "activeBlockId"
 const ACTIVE_MOB_KEY = "activeMobSlug"
 const LOCATION_ORDER = Object.keys(LOCATION_NAMES)
 const CRACK_STAGES = 8
+const SKY_PHASES = { dawn: "Світанок", day: "День", dusk: "Захід сонця", night: "Ніч" }
+const WEATHER = { rain: "Дощ", snow: "Сніг" }
+const CLOCK_FRAMES = 64
+
+// Час у форматі мови гри, але завжди 24-годинний: на піксельному шрифті AM/PM займає пів панелі
+function formatClock(time) {
+    try {
+        return new Intl.DateTimeFormat(getLanguage(), { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(time)
+    } catch {
+        const date = new Date(time)
+        return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`
+    }
+}
 const TAP_DEBRIS = 4
 const BREAK_DEBRIS = 18
 const MOB_DEBRIS = 2
@@ -232,6 +246,10 @@ function Tap() {
             refreshMobs()
         },
     })
+
+    const sky = useSky()
+    const skyLabel = [t(SKY_PHASES[sky.phase]), WEATHER[sky.weather] && t(WEATHER[sky.weather])].filter(Boolean).join(" · ")
+    const clockTime = formatClock(sky.time)
 
     const perBlock = Math.max(1, target?.total ?? 1)
     const blockProgress = target ? (progress[target.key] ?? 0) % perBlock : 0
@@ -487,7 +505,7 @@ function Tap() {
     return (
         <main id="Tap" className="Tap">
             <div className="Tap__scene">
-                <WorldScene depth={depth} ready={sceneReady} label={t(LOCATION_NAMES[LOCATION_ORDER[depth]])} />
+                <WorldScene depth={depth} ready={sceneReady} label={t(LOCATION_NAMES[LOCATION_ORDER[depth]])} sky={sky} skyLabel={skyLabel} />
             </div>
 
             <div className="Tap__hud mc-panel">
@@ -509,6 +527,12 @@ function Tap() {
                                 <span>{drop.broken ? t("Зламався інструмент: {name}", { name: itemName(drop.item) }) : `+${drop.quantity} ${itemName(drop.item)}`}</span>
                             </span>
                     ))}
+                </div>
+
+                {/* Годинник гри показує справжню пору доби в регіоні гравця */}
+                <div className="Tap__sky" role="img" aria-label={`${clockTime} · ${skyLabel}`}>
+                    <i className="Tap__clock" style={{ backgroundPositionY: `${sky.clock / (CLOCK_FRAMES - 1) * 100}%` }} />
+                    <span>{clockTime}</span>
                 </div>
 
                 <div className="Tap__status">

@@ -9,9 +9,11 @@ import { maxCraftTimes } from "../../utils/placement"
 import { haptic } from "../../utils/telegram"
 import { enchantmentName } from "../../utils/item-details"
 import { gameName, itemName, t } from "../../i18n"
+import { LOCATION_NAMES } from "../../config/quests.config"
 
 const PREVIEW_DELAY_MS = 120
 const MAX_BOOKSHELVES = 18
+const LOCATION_ICONS = { surface: "/items/grass_block.png", caves: "/items/dripstone_block.png", depths: "/items/sculk.png", nether: "/items/netherrack.png", end: "/items/end_stone.png" }
 
 function StationPanel({ station, placed, dragOver, handlers, onApplied }) {
     const { user, telegramData, catalog, applyResult, installBookshelves } = useUserContext()
@@ -76,10 +78,10 @@ function StationPanel({ station, placed, dragOver, handlers, onApplied }) {
 
     return <>
         <div className={`Inventory__craft-layout${layout.grid ? "" : " Inventory__craft-layout--slots"}`}>
-            <div className={layout.grid ? "Inventory__craft-grid" : "Inventory__station-slots"}>
+            <div className={layout.grid ? "Inventory__craft-grid" : `Inventory__station-slots${layout.arrange ? ` Inventory__station-slots--${layout.arrange}` : ""}`}>
                 {layout.slots.map(slot => <StationSlot key={slot.key} slot={slot} placed={placed} dragOver={dragOver} handlers={handlers} />)}
             </div>
-            <span className="Inventory__craft-arrow" aria-hidden="true">▶</span>
+            <span className={`Inventory__craft-arrow${preview?.result ? " Inventory__craft-arrow--ready" : ""}`} aria-hidden="true" />
             <div className="Inventory__result">
                 <ResultButton result={preview?.result} catalog={catalog} disabled={isBusy || !isFresh} xpCost={preview?.xpCost} onClick={() => apply(1)} />
                 {times > 1 && <button className="mc-btn mc-btn--small mc-btn--green Inventory__craft-all" disabled={isBusy || !isFresh} onClick={() => apply(times)}>
@@ -133,6 +135,20 @@ function StationPanel({ station, placed, dragOver, handlers, onApplied }) {
                 <Banner base={bannerBase} layers={[...bannerLayers, { pattern: choice.id, color: dyeColor }]} />
             </button>)}
         </div>}
+
+        {/* Стіл картографа: порожня мапа креслиться для однієї з відкритих локацій */}
+        {layout.choices === "locations" && choices.length > 0 && <>
+            <p className="Inventory__hint">{t("Обери локацію для мапи")}</p>
+            <div className="Inventory__locations">
+                {choices.map(choice => <button key={choice.id} disabled={!choice.open}
+                    className={`Inventory__location${options.location === choice.id ? " Inventory__location--active" : ""}`}
+                    aria-label={choice.open ? t(LOCATION_NAMES[choice.id]) : `${t(LOCATION_NAMES[choice.id])}: ${t("Потрібен рівень досвіду {level}", { level: choice.level })}`}
+                    onClick={() => setOptions({ location: choice.id })}>
+                    <ServerImage imgSrc={LOCATION_ICONS[choice.id]} alt="" />
+                    <span>{choice.open ? t(LOCATION_NAMES[choice.id]) : `🔒 ${choice.level}`}</span>
+                </button>)}
+            </div>
+        </>}
 
         {shownMessage && <p className="Inventory__message">{shownMessage}</p>}
     </>

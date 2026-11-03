@@ -409,21 +409,60 @@ function paint(atlas, map) {
     return canvas
 }
 
+// Рядки поверхні, які темніють уночі: маска з тих самих пікселів, тож небо за пагорбами лишається своїм
+const SURFACE_ROWS = 30
+
+function surfaceMask(canvas) {
+    const crop = document.createElement("canvas")
+    crop.width = COLUMNS * TILE
+    crop.height = SURFACE_ROWS * TILE
+    crop.getContext("2d").drawImage(canvas, 0, 0, crop.width, crop.height, 0, 0, crop.width, crop.height)
+    return crop.toDataURL()
+}
+
+// Смуги хмар із текстури гри: кожен піксель маски це клітинка хмари, три рядки дають їй товщину
+const CLOUD_CELL = { width: 14, height: 9 }
+
+function cloudStrips(image, rows) {
+    const source = document.createElement("canvas")
+    source.width = image.width
+    source.height = image.height
+    const context = source.getContext("2d")
+    context.drawImage(image, 0, 0)
+    const pixels = context.getImageData(0, 0, image.width, image.height).data
+    return rows.map(row => {
+        const strip = document.createElement("canvas")
+        strip.width = image.width * CLOUD_CELL.width
+        strip.height = 3 * CLOUD_CELL.height
+        const target = strip.getContext("2d")
+        target.fillStyle = "#fff"
+        for (let line = 0; line < 3; line += 1) {
+            for (let x = 0; x < image.width; x += 1) {
+                if (pixels[((row + line) * image.width + x) * 4 + 3] > 128) target.fillRect(x * CLOUD_CELL.width, line * CLOUD_CELL.height, CLOUD_CELL.width, CLOUD_CELL.height)
+            }
+        }
+        return { url: strip.toDataURL(), width: strip.width, height: strip.height }
+    })
+}
+
+const loadImage = src => new Promise((resolve, reject) => {
+    const image = new Image()
+    image.onload = () => resolve(image)
+    image.onerror = reject
+    image.src = src
+})
+
 let loading = null
 
 function loadWorld() {
     if (!loading) {
-        loading = new Promise((resolve, reject) => {
-            const atlas = new Image()
-            atlas.onload = () => {
-                const map = buildMap()
-                resolve({ canvas: paint(atlas, map), torches: map.torches })
-            }
-            atlas.onerror = reject
-            atlas.src = "/assets/world/atlas.png"
+        loading = Promise.all([loadImage("/assets/world/atlas.png"), loadImage("/assets/world/clouds.png").catch(() => null)]).then(([atlas, clouds]) => {
+            const map = buildMap()
+            const canvas = paint(atlas, map)
+            return { canvas, torches: map.torches, mask: surfaceMask(canvas), clouds: clouds ? cloudStrips(clouds, [57, 101]) : [] }
         })
     }
     return loading
 }
 
-export { FLOOR, ROOM_TOP, ROWS, STOPS, loadWorld }
+export { FLOOR, ROOM_TOP, ROWS, STOPS, SURFACE_ROWS, loadWorld }

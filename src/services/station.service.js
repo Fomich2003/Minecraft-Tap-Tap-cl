@@ -55,6 +55,26 @@ class StationService {
         return post(`/station/${slug}/fill`, { telegramData, slots, count })
     }
 
+    expedition(telegramData, slug) {
+        return post(`/station/${slug}/expedition`, { telegramData })
+    }
+
+    expeditionPreview(telegramData, slug, map) {
+        return post(`/station/${slug}/expedition/preview`, { telegramData, map })
+    }
+
+    startExpedition(telegramData, slug, map) {
+        return post(`/station/${slug}/expedition/start`, { telegramData, map })
+    }
+
+    collectExpedition(telegramData, slug) {
+        return post(`/station/${slug}/expedition/collect`, { telegramData })
+    }
+
+    recallExpedition(telegramData, slug) {
+        return post(`/station/${slug}/expedition/recall`, { telegramData })
+    }
+
     collect(telegramData, slug) {
         return post(`/station/${slug}/collect`, { telegramData })
     }

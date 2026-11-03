@@ -24,11 +24,12 @@
         gap: 6px;
         padding: 0 4px;
         border: 2px solid var(--outline);
-        background: var(--surface-1);
+        background: var(--surface-2);
+        box-shadow: inset 0 2px 0 var(--hi), inset 0 -3px 0 var(--lo);
         color: var(--text-muted);
         font-size: 14px;
         font-weight: 800;
-        transition: background-color 90ms linear, color 90ms linear;
+        transition: background-color 120ms linear, color 120ms linear;
 
         span {
             overflow: hidden;
@@ -50,31 +51,132 @@
         }
     }
 
-    // Сцена з п'єдесталом: кожна таблиця стоїть у своєму світі
+    // Сцена з п'єдесталом: кожна таблиця стоїть у своєму світі, а земля складена з блоків
     .Top__podium {
         --ground: url("/assets/tiles/grass.png");
-        --sky: linear-gradient(180deg, #4f86e0, #9cc6f7);
+        --under: url("/assets/tiles/dirt.png");
 
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        align-items: end;
-        gap: 6px;
+        position: relative;
+        min-height: 286px;
         overflow: hidden;
-        padding: 16px 10px 32px;
-        border: 2px solid var(--outline);
-        background: var(--ground) 0 100% / 32px 32px repeat-x, var(--sky);
-        box-shadow: inset 0 2px 0 rgb(255 255 255 / 18%);
+        border: 3px solid var(--outline);
+        background: linear-gradient(180deg, #03050e, #0d1430 70%, #1b2547);
+        box-shadow: inset 0 2px 0 rgb(255 255 255 / 14%), 0 4px 0 rgb(0 0 0 / 35%);
         image-rendering: pixelated;
+
+        // Два ряди блоків під п'єдесталами: трава й земля
+        &::after {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            height: 48px;
+            background: var(--ground) 0 0 / 24px 24px repeat-x, var(--under) 0 24px / 24px 24px repeat-x;
+            box-shadow: inset 0 3px 0 rgb(0 0 0 / 25%);
+            content: "";
+        }
 
         &--coins {
             --ground: url("/assets/tiles/stone.png");
-            --sky: linear-gradient(180deg, #16171b, #3a3d44);
+            --under: url("/assets/tiles/deepslate.png");
+
+            background: #26272b url("/assets/tiles/stone.png") 0 0 / 48px 48px;
+            box-shadow: inset 0 0 0 999px rgb(8 8 12 / 62%), 0 4px 0 rgb(0 0 0 / 35%);
         }
 
         &--bosses {
             --ground: url("/assets/tiles/end_stone.png");
-            --sky: radial-gradient(circle at 18% 22%, #fff 0 1px, transparent 2px), radial-gradient(circle at 76% 14%, #fff 0 1px, transparent 2px), radial-gradient(circle at 88% 44%, #fff 0 1px, transparent 2px), radial-gradient(circle at 42% 8%, #fff 0 1px, transparent 2px), linear-gradient(180deg, #120822, #40215f);
+            --under: url("/assets/tiles/obsidian.png");
+
+            background: radial-gradient(ellipse 70% 50% at 70% 20%, rgb(160 70 220 / 40%), transparent), linear-gradient(180deg, #0a0414, #2a1347 80%, #3b1e5f);
         }
+
+        &--loading {
+            background: var(--surface-1);
+            animation: top-beam 1.2s ease-in-out infinite;
+
+            &::after { opacity: .4; }
+        }
+    }
+
+    .Top__sky {
+        position: absolute;
+        inset: 0;
+        transition: opacity 20s linear;
+
+        &--day { background: linear-gradient(180deg, #4a7fdc, #8fbaf5 70%, #c4dcfb); }
+        &--dusk { background: linear-gradient(180deg, transparent 20%, rgb(122 86 160 / 70%) 50%, #e9785a 80%, #ffb35c); }
+    }
+
+    // Нерухомі зорі з кількох радіальних точок: малюються без жодного елемента на кожну
+    .Top__stars {
+        position: absolute;
+        inset: 0 0 48px;
+        background:
+            radial-gradient(circle at 12% 18%, #fff 0 1px, transparent 2px), radial-gradient(circle at 31% 9%, #fff 0 1px, transparent 2px),
+            radial-gradient(circle at 54% 26%, #fff 0 1px, transparent 2px), radial-gradient(circle at 73% 12%, #fff 0 1px, transparent 2px),
+            radial-gradient(circle at 88% 34%, #fff 0 1px, transparent 2px), radial-gradient(circle at 22% 44%, #d9c8ff 0 1px, transparent 2px),
+            radial-gradient(circle at 64% 48%, #d9c8ff 0 1px, transparent 2px), radial-gradient(circle at 94% 6%, #fff 0 1px, transparent 2px);
+        transition: opacity 20s linear;
+        animation: top-twinkle 5s steps(5) infinite;
+    }
+
+    // Факел у шахті: тепле світло на камені
+    .Top__torch {
+        position: absolute;
+        top: 64px;
+        width: 24px;
+        height: 24px;
+        margin-left: -12px;
+        background: url("/items/torch.png") center / contain no-repeat;
+
+        &::before {
+            position: absolute;
+            inset: -70px;
+            background: radial-gradient(closest-side, rgb(255 170 80 / 38%), transparent);
+            content: "";
+            animation: top-flicker 900ms steps(4) infinite;
+        }
+    }
+
+    // Промінь маяка над першим місцем
+    .Top__beam {
+        position: absolute;
+        top: 0;
+        bottom: 150px;
+        left: 50%;
+        width: 34px;
+        margin-left: -17px;
+        background: linear-gradient(90deg, transparent, rgb(255 255 255 / 55%) 35%, rgb(255 255 255 / 75%) 50%, rgb(255 255 255 / 55%) 65%, transparent);
+        mix-blend-mode: soft-light;
+        animation: top-beam 3.4s ease-in-out infinite;
+    }
+
+    .Top__podium--bosses .Top__beam { background: linear-gradient(90deg, transparent, rgb(220 160 255 / 55%) 40%, rgb(255 230 255 / 80%) 50%, rgb(220 160 255 / 55%) 60%, transparent); mix-blend-mode: screen; }
+    .Top__podium--coins .Top__beam { background: linear-gradient(90deg, transparent, rgb(255 225 120 / 40%) 40%, rgb(255 240 180 / 60%) 50%, rgb(255 225 120 / 40%) 60%, transparent); mix-blend-mode: screen; }
+
+    // Кулі досвіду піднімаються від переможця
+    .Top__spark {
+        position: absolute;
+        bottom: 150px;
+        width: 5px;
+        height: 5px;
+        background: #c8ff5a;
+        box-shadow: 0 0 6px #80ff20;
+        opacity: 0;
+        animation: top-spark 3.6s ease-out infinite;
+    }
+
+    .Top__places {
+        position: absolute;
+        z-index: 1;
+        right: 8px;
+        bottom: 48px;
+        left: 8px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        align-items: end;
+        gap: 6px;
     }
 
     .Top__place {
@@ -83,26 +185,96 @@
         min-width: 0;
         flex-direction: column;
         align-items: center;
-        gap: 3px;
-        animation: top-rise 420ms var(--ease-out) backwards;
+        animation: top-rise 700ms var(--ease-out) backwards;
 
         // Другий ліворуч від першого, але читач екрана зустрічає гравців за порядком
-        &--2 { order: -1; animation-delay: 110ms; }
-        &--3 { animation-delay: 220ms; }
+        &--2 { order: -1; animation-delay: 160ms; }
+        &--3 { animation-delay: 320ms; }
 
-        &--me .Top__avatar { outline: 3px solid #fff; outline-offset: -1px; }
-        &--me .Top__name { color: var(--xp); }
+        &--me .Top__face { outline: 3px solid var(--xp); outline-offset: 1px; }
+        &--me .Top__nametag { color: var(--xp); }
+    }
 
-        .Top__name {
-            width: 100%;
-            font-size: 13px;
-            text-align: center;
-            text-shadow: 1px 1px 0 rgb(0 0 0 / 80%);
+    // Табличка з іменем над головою, як над гравцем у грі
+    .Top__nametag {
+        max-width: 100%;
+        overflow: hidden;
+        margin-bottom: 6px;
+        padding: 1px 5px;
+        background: rgb(0 0 0 / 45%);
+        font-size: 12px;
+        font-weight: 700;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .Top__head {
+        position: relative;
+        display: block;
+        margin-bottom: 4px;
+        animation: top-bob 2.6s ease-in-out infinite;
+
+        &--empty {
+            width: 40px;
+            height: 40px;
+            border: 2px dashed rgb(255 255 255 / 28%);
+            animation: none;
+        }
+    }
+
+    .Top__place--2 .Top__head { animation-delay: -.8s; }
+    .Top__place--3 .Top__head { animation-delay: -1.6s; }
+
+    .Top__face {
+        display: block;
+        width: 40px;
+        height: 40px;
+        border: 2px solid var(--outline);
+        image-rendering: pixelated;
+        box-shadow: 0 4px 0 rgb(0 0 0 / 30%);
+    }
+
+    .Top__place--1 .Top__face { width: 52px; height: 52px; }
+    .Top__place--1 .Top__nametag { margin-bottom: 24px; }
+
+    .Top__crown {
+        position: absolute;
+        z-index: 1;
+        top: -22px;
+        left: 50%;
+        width: 44px;
+        height: 44px;
+        margin-left: -22px;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 0 rgb(0 0 0 / 45%));
+    }
+
+    // П'єдестал складений з блоків: висота кратна блоку, тож текстура не ріжеться
+    .Top__pedestal {
+        position: relative;
+        display: flex;
+        width: 100%;
+        height: 48px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        border: 2px solid var(--outline);
+        border-bottom: 0;
+        background: #6d6e72 url("/assets/tiles/stone.png") 0 0 / 24px 24px;
+        box-shadow: inset 3px 3px 0 rgb(255 255 255 / 30%), inset -3px 0 0 rgb(0 0 0 / 28%);
+        image-rendering: pixelated;
+
+        .Top__rank {
+            color: #fff;
+            font-family: var(--font-pixel);
+            font-size: 18px;
+            text-shadow: -2px 0 0 #000, 2px 0 0 #000, 0 -2px 0 #000, 0 2px 0 #000, 3px 3px 0 #000;
         }
 
         // Довга сума переноситься на другий рядок: колонка на телефоні вужча за «123,5 млрд»
         .Top__stat {
-            max-width: 100%;
+            max-width: calc(100% - 8px);
             justify-content: center;
             padding: 2px 4px;
             background: rgb(0 0 0 / 62%);
@@ -112,82 +284,19 @@
         }
     }
 
-    .Top__crown {
-        display: block;
-        margin-bottom: -10px;
-        animation: mc-bob 1800ms steps(8) infinite;
-
-        img {
-            display: block;
-            width: 36px;
-            height: 36px;
-            object-fit: contain;
-            filter: drop-shadow(0 3px 0 rgb(0 0 0 / 40%));
-        }
-    }
-
-    .Top__avatar {
-        display: grid;
-        width: 48px;
-        height: 48px;
-        flex: 0 0 auto;
-        place-items: center;
-        border: 3px solid var(--outline);
-        background: var(--green);
-        box-shadow: inset 0 0 0 2px var(--green-hi), 0 3px 0 rgb(0 0 0 / 35%);
-        font-family: var(--font-pixel);
-        font-size: 18px;
-        line-height: 1;
-        text-shadow: 2px 2px 0 var(--green-lo);
-
-        &--empty {
-            background: rgb(0 0 0 / 35%);
-            box-shadow: none;
-            color: rgb(255 255 255 / 55%);
-            text-shadow: none;
-        }
-    }
-
-    .Top__place--1 .Top__avatar {
-        width: 58px;
-        height: 58px;
-        font-size: 22px;
-    }
-
-    .Top__pedestal {
-        position: relative;
-        display: grid;
-        width: 100%;
-        height: 48px;
-        margin-top: 3px;
-        place-items: center;
-        border: 2px solid var(--outline);
-        border-bottom: 0;
-        background: #6d6e72 url("/assets/tiles/stone.png") 0 0 / 48px 48px;
-        box-shadow: inset 2px 2px 0 rgb(255 255 255 / 35%), inset -2px 0 0 rgb(0 0 0 / 30%);
-        image-rendering: pixelated;
-
-        .Top__rank {
-            color: #fff;
-            font-family: var(--font-pixel);
-            font-size: 20px;
-            text-shadow: -2px 0 0 #000, 2px 0 0 #000, 0 -2px 0 #000, 0 2px 0 #000, 3px 3px 0 #000;
-        }
-    }
-
-    // Висота кратна блоку: текстура не обрізається посередині плитки
     .Top__place--1 .Top__pedestal { height: 96px; }
     .Top__place--2 .Top__pedestal { height: 72px; }
+    .Top__place--empty .Top__pedestal { opacity: .55; }
 
-    .Top__place--rank1 .Top__pedestal { background: #e8b923 url("/assets/tiles/gold_block.png") 0 0 / 48px 48px; }
-    .Top__place--rank2 .Top__pedestal { background: #c6ccd2 url("/assets/tiles/iron_block.png") 0 0 / 48px 48px; }
-    .Top__place--rank3 .Top__pedestal { background: #c47a3f url("/assets/tiles/copper_block.png") 0 0 / 48px 48px; }
+    .Top__place--rank1 .Top__pedestal { background: #e8b923 url("/assets/tiles/gold_block.png") 0 0 / 24px 24px; }
+    .Top__place--rank2 .Top__pedestal { background: #c6ccd2 url("/assets/tiles/iron_block.png") 0 0 / 24px 24px; }
+    .Top__place--rank3 .Top__pedestal { background: #c47a3f url("/assets/tiles/copper_block.png") 0 0 / 24px 24px; }
 
     // Решта гравців одна таблиця, а не окремі картки
     .Top__list {
         margin: 0;
         padding: 0;
-        border: 2px solid var(--outline);
+        border: 3px solid var(--outline);
         background: var(--surface-1);
         list-style: none;
     }
@@ -195,22 +304,29 @@
     .Top__row {
         display: flex;
         align-items: center;
-        gap: 8px;
-        min-height: 50px;
+        gap: 10px;
+        min-height: 54px;
         padding-block: 6px;
         padding-inline: 0 10px;
-        animation: mc-rise 220ms var(--ease-out) backwards;
+        animation: mc-rise 260ms var(--ease-out) backwards;
 
         &:nth-child(even) { background: var(--surface-2); }
         & + & { border-top: 2px solid var(--outline); }
 
         .Top__rank {
-            min-width: 44px;
+            min-width: 40px;
             flex: 0 0 auto;
             color: var(--text-muted);
             font-family: var(--font-pixel);
             font-size: 11px;
             text-align: center;
+        }
+
+        .Top__face {
+            width: 34px;
+            height: 34px;
+            flex: 0 0 auto;
+            box-shadow: none;
         }
 
         > .Top__stat {
@@ -223,7 +339,7 @@
         &--me,
         &--me:nth-child(even) {
             background: #24401c;
-            border-inline-start: 4px solid var(--xp);
+            box-shadow: inset 4px 0 0 var(--xp);
 
             .Top__rank, .Top__name { color: var(--xp); }
         }
@@ -275,21 +391,22 @@
     .Top__mine {
         position: sticky;
         z-index: 2;
-        bottom: calc(var(--navbar-height) + var(--safe-bottom));
+        bottom: calc(var(--navbar-height) + var(--safe-bottom) + 6px);
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 6px 10px;
-        border: 2px solid var(--outline);
+        padding: 6px 10px 6px 6px;
+        border: 3px solid var(--outline);
         background: var(--green-lo);
-        box-shadow: inset 0 2px 0 var(--green);
+        box-shadow: inset 0 3px 0 var(--green), 0 4px 0 rgb(0 0 0 / 40%);
 
-        .Top__stat { flex: 0 0 auto; font-size: 11px; }
-        .Top__stat img, .Top__stat svg { width: 18px; height: 18px; }
+        .Top__face { width: 36px; height: 36px; box-shadow: none; }
+        > .Top__stat { flex: 0 0 auto; font-size: 11px; }
+        > .Top__stat img, > .Top__stat svg { width: 18px; height: 18px; }
     }
 
     .Top__mine-rank {
-        min-width: 38px;
+        min-width: 34px;
         flex: 0 0 auto;
         color: var(--xp);
         font-family: var(--font-pixel);
@@ -297,14 +414,20 @@
         text-align: center;
     }
 
-    .Top__mine-label {
+    .Top__mine-text {
+        display: flex;
         min-width: 0;
         flex: 1;
-        overflow: hidden;
-        font-size: 13px;
-        font-weight: 800;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        flex-direction: column;
+
+        strong, span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        strong { font-size: 13px; font-weight: 800; }
+        span { color: #cfe8c4; font-size: 12px; }
     }
 }
 
@@ -317,7 +440,39 @@
     }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    #Top .Top__head,
+    #Top .Top__spark,
+    #Top .Top__beam { animation: none; }
+}
+
 @keyframes top-rise {
-    from { transform: translateY(70%); }
-    to { transform: translateY(0); }
+    from { opacity: 0; transform: translateY(60%); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes top-bob {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -5px; }
+}
+
+@keyframes top-beam {
+    0%, 100% { opacity: .55; }
+    50% { opacity: 1; }
+}
+
+@keyframes top-spark {
+    0% { opacity: 0; transform: translate(0, 0); }
+    15% { opacity: 1; }
+    100% { opacity: 0; transform: translate(10px, -120px); }
+}
+
+@keyframes top-twinkle {
+    0%, 100% { filter: brightness(.6); }
+    50% { filter: brightness(1.2); }
+}
+
+@keyframes top-flicker {
+    0%, 100% { opacity: 1; scale: 1; }
+    50% { opacity: .75; scale: 1.08; }
 }

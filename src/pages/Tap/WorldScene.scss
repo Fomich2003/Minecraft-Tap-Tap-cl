@@ -42,13 +42,166 @@
     will-change: transform;
 }
 
+// Небо з трьох шарів: нічний лежить знизу, денний і сутінковий проявляються над ним.
+// Стан міняється раз на 20 секунд, тому переходи тривають стільки ж: доба пливе, а не перемикається
+$sky-step: 20s;
+
 .World__sky {
     position: absolute;
     top: -600px;
     right: 0;
     left: 0;
     height: 1100px;
-    background: linear-gradient(180deg, #3f76d4 0%, #6fa6ee 62%, #d6e9ff 100%);
+    overflow: hidden;
+    background: linear-gradient(180deg, #020309 0%, #070b1c 45%, #121b3a 82%, #1b2547 100%);
+
+    &--asleep * {
+        animation-play-state: paused !important;
+    }
+}
+
+.World__sky-layer {
+    position: absolute;
+    inset: 0;
+    transition: opacity $sky-step linear;
+
+    &--day { background: linear-gradient(180deg, #4a7fdc 0%, #6b9cf0 50%, #9cc2f7 82%, #c4dcfb 100%); }
+
+    &--dusk { background: linear-gradient(180deg, transparent 30%, rgb(122 86 160 / 70%) 60%, #e9785a 84%, #ffb35c 100%); }
+
+    &--storm { background: linear-gradient(180deg, #3b4250 0%, #59606e 60%, #7b8290 100%); }
+}
+
+// Захід підсвічує небо там, де сідає сонце
+.World__horizon-glow {
+    position: absolute;
+    top: 820px;
+    width: 420px;
+    height: 300px;
+    margin-left: -210px;
+    background: radial-gradient(closest-side, rgb(255 170 90 / 70%), rgb(255 120 80 / 25%) 55%, transparent);
+    transition: opacity $sky-step linear, left $sky-step linear;
+    pointer-events: none;
+}
+
+.World__stars {
+    position: absolute;
+    inset: 0;
+    transition: opacity $sky-step linear;
+
+    i {
+        position: absolute;
+        background: #fff;
+        animation: world-twinkle 6s steps(6) infinite;
+    }
+}
+
+// Сонце й місяць із текстур гри, збільшені вдвічі без згладжування
+.World__celestial {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 128px;
+    height: 128px;
+    background: url("/assets/world/sun.png") 0 0 / 100% 100%;
+    image-rendering: pixelated;
+    // Текстури світил гри мають чорне тло й накладаються додаванням світла
+    mix-blend-mode: screen;
+    transition: transform $sky-step linear, opacity $sky-step linear;
+
+    &::after {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(closest-side, rgb(255 244 190 / 30%), transparent);
+        content: "";
+        animation: world-pulse 6s ease-in-out infinite;
+    }
+
+    &--moon::after {
+        background: radial-gradient(closest-side, rgb(190 210 255 / 18%), transparent);
+    }
+}
+
+// Хмари гри: смуга з маски clouds.png повторюється двічі й їде по колу
+.World__clouds {
+    position: absolute;
+    left: 0;
+    width: calc(var(--cloud-width) * 2);
+    animation: world-clouds 420s linear infinite;
+
+    i {
+        position: absolute;
+        inset: 0;
+        mask-repeat: repeat-x;
+        mask-size: var(--cloud-width) 100%;
+        transition: background-color $sky-step linear;
+        image-rendering: pixelated;
+        -webkit-mask-repeat: repeat-x;
+        -webkit-mask-size: var(--cloud-width) 100%;
+    }
+}
+
+// Тінь ночі лежить лише на пікселях землі й дерев, а донизу розчиняється в печері
+.World__shade {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    background: #050a26;
+    mask-composite: intersect;
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    transition: opacity $sky-step linear;
+    pointer-events: none;
+    -webkit-mask-composite: source-in;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+}
+
+.World__daylife,
+.World__nightlife {
+    position: absolute;
+    inset: 0;
+    transition: opacity $sky-step linear;
+}
+
+// Світлячки з кущів 1.21: жовто-зелені точки повільно блукають і спалахують
+.World__firefly {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #e8ff7a;
+    box-shadow: 0 0 6px 2px rgb(214 255 90 / 65%);
+    animation: world-firefly 7s ease-in-out infinite, world-glow 2.4s steps(4) infinite;
+}
+
+// Дощ і сніг гри: текстура стрічкою падає перед землею
+.World__weather {
+    position: absolute;
+    top: -320px;
+    right: 0;
+    left: 0;
+    height: 800px;
+    overflow: hidden;
+    pointer-events: none;
+
+    i {
+        position: absolute;
+        top: -512px;
+        right: 0;
+        left: 0;
+        height: calc(100% + 512px);
+        background: url("/assets/world/rain.png") 0 0 / 128px 512px repeat;
+        image-rendering: pixelated;
+        opacity: .95;
+        animation: world-rain .55s linear infinite;
+    }
+
+    &--snow i {
+        background-image: url("/assets/world/snow.png");
+        opacity: .9;
+        animation-duration: 7s;
+    }
 }
 
 .World__holder {
@@ -85,29 +238,16 @@
     font-weight: 800;
     text-align: center;
     text-shadow: 2px 2px 0 rgb(0 0 0 / 75%);
-    animation: world-place 2600ms var(--ease-out) both;
+    animation: world-place 3400ms var(--ease-out) both;
     pointer-events: none;
-}
 
-.World__sun {
-    position: absolute;
-    top: 176px;
-    left: calc(50% - 158px);
-    width: 56px;
-    height: 56px;
-    background: #fff7b8;
-    box-shadow: 0 0 0 8px rgb(255 247 184 / 35%), 0 0 0 20px rgb(255 247 184 / 16%);
-}
-
-.World__cloud {
-    position: absolute;
-    left: 0;
-    width: 104px;
-    height: 18px;
-    background: #fff;
-    box-shadow: 16px -12px 0 -1px #fff, 44px -12px 0 -1px #fff, 62px -22px 0 -6px #fff;
-    opacity: .92;
-    animation: world-cloud 78s linear infinite;
+    small {
+        display: block;
+        margin-top: 4px;
+        color: #f3e9c8;
+        font-size: 14px;
+        font-weight: 700;
+    }
 }
 
 .World__bird {
@@ -247,15 +387,6 @@
     background: linear-gradient(135deg, #ffd8ff, #c14fe0 55%, #5b1f8c);
     box-shadow: 0 0 18px rgb(214 110 255 / 80%);
     animation: world-crystal 2.8s ease-in-out infinite;
-}
-
-// Промінь від сонця дихає разом із небом
-.World__sun::after {
-    position: absolute;
-    inset: -34px;
-    background: radial-gradient(closest-side, rgb(255 247 184 / 34%), transparent);
-    content: "";
-    animation: world-pulse 5s ease-in-out infinite;
 }
 
 .World__leaf {
@@ -467,6 +598,9 @@
     }
 
     .World__streaks { display: none; }
+
+    .World__clouds,
+    .World__weather i { animation: none; }
 }
 
 @keyframes world-leaf {
@@ -576,9 +710,26 @@
     100% { opacity: 0; transform: translateY(-8px); }
 }
 
-@keyframes world-cloud {
-    from { transform: translateX(-160px); }
-    to { transform: translateX(800px); }
+@keyframes world-clouds {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(var(--cloud-width) * -1)); }
+}
+
+@keyframes world-firefly {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(14px, -10px); }
+    50% { transform: translate(-6px, -22px); }
+    75% { transform: translate(-16px, -6px); }
+}
+
+@keyframes world-glow {
+    0%, 100% { opacity: .15; }
+    50% { opacity: 1; }
+}
+
+@keyframes world-rain {
+    from { transform: translateY(0); }
+    to { transform: translateY(512px); }
 }
 
 @keyframes world-bird {

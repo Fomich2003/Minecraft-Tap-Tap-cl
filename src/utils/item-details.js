@@ -1,4 +1,5 @@
 import { gameName, itemName, t } from "../i18n"
+import { LOCATION_NAMES } from "../config/quests.config"
 
 const ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
 
@@ -54,7 +55,9 @@ function describeComponents(entry, catalog) {
     if (components.dyed_color !== undefined) lines.push(t("Колір: {color}", { color: `#${components.dyed_color.toString(16).padStart(6, "0")}` }))
     if (components.banner_patterns?.length) lines.push(t("Візерунків: {count}", { count: components.banner_patterns.length }))
     if (components.fireworks) lines.push(t("Тривалість польоту: {count}", { count: components.fireworks.flight_duration }))
+    if (components.map_location) lines.push(t("Мапа: {location}", { location: t(LOCATION_NAMES[components.map_location] ?? components.map_location) }))
     if (components.map_scale !== undefined) lines.push(t("Масштаб мапи: {count}", { count: components.map_scale }))
+    if (components.map_locked) lines.push(t("Захищена склом: повертається з походу"))
     return lines
 }
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import ServerImage from "../../components/ServerImage/ServerImage"
 import stationService from "../../services/station.service"
 import { useUserContext } from "../../context/UserContext"
@@ -114,7 +114,8 @@ function JobPanel({ station, placed, dragOver, handlers, onApplied }) {
         const outputName = output && stackLabel({ itemId: output, components: job.output.components }, catalog)
         return <>
             <div className="Inventory__job">
-                {output && <ServerImage imgSrc={itemIcon(output, job.output.components)} imgClass="Inventory__job-image" alt={outputName} />}
+                {!isBrewing && <i className="Inventory__flame Inventory__flame--lit Inventory__flame--burning" aria-hidden="true" />}
+                {output &&<ServerImage imgSrc={itemIcon(output, job.output.components)} imgClass="Inventory__job-image" alt={outputName} />}
                 <div className="Inventory__job-info">
                     <strong>{outputName}</strong>
                     <span>{t("Готово {finished} з {total}", { finished, total: job.units })}</span>
@@ -131,10 +132,14 @@ function JobPanel({ station, placed, dragOver, handlers, onApplied }) {
 
     return <>
         <div className="Inventory__craft-layout Inventory__craft-layout--slots">
-            <div className="Inventory__station-slots">
-                {slots.map(slot => <StationSlot key={slot.key} slot={slot} placed={shownSlots} dragOver={dragOver} handlers={handlers} />)}
+            <div className={`Inventory__station-slots${layout.arrange ? ` Inventory__station-slots--${layout.arrange}` : ""}`}>
+                {slots.map((slot, index) => <Fragment key={slot.key}>
+                    {/* Вогник печі між сировиною й паливом, як у грі: горить, коли все готово до старту */}
+                    {layout.arrange === "furnace" && index === 1 && <i className={`Inventory__flame${canCook ? " Inventory__flame--lit" : ""}`} aria-hidden="true" />}
+                    <StationSlot slot={slot} placed={shownSlots} dragOver={dragOver} handlers={handlers} />
+                </Fragment>)}
             </div>
-            <span className="Inventory__craft-arrow" aria-hidden="true">▶</span>
+            <span className={`Inventory__craft-arrow${cookPreview?.result ? " Inventory__craft-arrow--ready" : ""}`} aria-hidden="true" />
             <div className="Inventory__result">
                 <ResultButton result={cookPreview?.result} catalog={catalog} disabled />
             </div>
