@@ -11,6 +11,7 @@ import Banner from "../../components/Banner/Banner"
 import ReferralCard from "./ReferralCard"
 import CardReveal from "../../components/CardReveal/CardReveal"
 import { gameName, itemName, t } from "../../i18n"
+import { rewardBurst } from "../../utils/particles"
 
 function Avatar({ photo, name }) {
     const [failed, setFailed] = useState(false)
@@ -71,8 +72,10 @@ function Profile() {
     const ownedStations = stations.filter(station => station.owned).length
     const myMobs = (mobs ?? []).filter(mob => (mob.owned && !mob.boss) || mob.kills > 0).sort((left, right) => right.kills - left.kills)
 
-    const claim = async () => {
+    const claim = async event => {
         if (isClaiming) return
+        // Кнопка зникне, щойно нагороду забрано, тому точку вильоту монет треба взяти до запиту
+        const origin = event?.currentTarget?.getBoundingClientRect()
         setIsClaiming(true)
         setMessage("")
         const before = user.balance
@@ -80,6 +83,7 @@ function Profile() {
         setIsClaiming(false)
         if (result.success) {
             setReward(result.user.balance - before)
+            if (origin) rewardBurst(origin.left + origin.width / 2, origin.top + origin.height / 2, { coins: result.user.balance - before })
             setLoot(result.loot ?? [])
             setDailyCard(result.card ?? null)
             haptic("success")

@@ -17,38 +17,20 @@ const removeAfter = (animation, node) => {
     animation.oncancel = () => node.remove()
 }
 
-function showTapNumber(layer, x, y, value) {
+// Критичний удар піднімає число вище, більшим і з підписом: його видно навіть посеред серії тапів
+function showTapNumber(layer, x, y, value, critLabel = null) {
     if (layer.childElementCount >= MAX_NODES) return
-    const node = addNode(layer, "Tap__number", x, y)
+    const node = addNode(layer, critLabel ? "Tap__number Tap__number--crit" : "Tap__number", x, y)
     node.textContent = `+${value}`
+    if (critLabel) node.dataset.label = critLabel
     const drift = (Math.random() - 0.5) * 70
+    const rise = critLabel ? -300 : -240
     removeAfter(node.animate([
         { opacity: 0, transform: "translate(-50%, -30%) scale(.6)" },
-        { opacity: 1, transform: "translate(-50%, -80%) scale(1.15)", offset: .18 },
-        { opacity: 0, transform: `translate(calc(-50% + ${drift}px), -240%) scale(.9)` },
-    ], { duration: reducedMotion() ? 300 : 760, easing: "cubic-bezier(.16,.7,.25,1)" }), node)
-}
-
-// Осколки беруть вигляд із текстури самого блока
-function burstChips(layer, x, y, iconUrl, count) {
-    if (reducedMotion()) return
-    const allowed = Math.min(count, MAX_NODES - layer.childElementCount)
-
-    for (let index = 0; index < allowed; index += 1) {
-        const node = addNode(layer, "Tap__chip", x, y)
-        node.style.backgroundImage = `url("${iconUrl}")`
-        node.style.backgroundPosition = `${Math.random() * 100}% ${Math.random() * 100}%`
-
-        const angle = Math.random() * Math.PI * 2
-        const reach = 36 + Math.random() * 64
-        const dx = Math.cos(angle) * reach
-        const dy = Math.sin(angle) * reach
-        removeAfter(node.animate([
-            { opacity: 1, transform: "translate(-50%, -50%) rotate(0deg)" },
-            { opacity: 1, transform: `translate(calc(-50% + ${dx * .7}px), calc(-50% + ${dy * .7 - 26}px)) rotate(${dx * 2}deg)`, offset: .45 },
-            { opacity: 0, transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy + 90}px)) rotate(${dx * 4}deg)` },
-        ], { duration: 520 + Math.random() * 180, easing: "cubic-bezier(.3,.5,.6,1)" }), node)
-    }
+        { opacity: 1, transform: `translate(-50%, -80%) scale(${critLabel ? 1.45 : 1.15})`, offset: .18 },
+        { opacity: 1, transform: `translate(calc(-50% + ${drift * .5}px), -150%) scale(1)`, offset: .6 },
+        { opacity: 0, transform: `translate(calc(-50% + ${drift}px), ${rise}%) scale(.9)` },
+    ], { duration: reducedMotion() ? 300 : critLabel ? 950 : 760, easing: "cubic-bezier(.16,.7,.25,1)" }), node)
 }
 
 // Часточки кольору активних ефектів, як завитки зілля навколо персонажа
@@ -131,4 +113,4 @@ function punchBlock(node, broke) {
     lastPunch = node.animate(broke ? BREAK : PUNCH, { duration: broke ? 240 : 130, easing: "steps(5)" })
 }
 
-export { showTapNumber, burstChips, burstEffects, swingTool, punchBlock, shatterBlock, hurtMob }
+export { showTapNumber, burstEffects, swingTool, punchBlock, shatterBlock, hurtMob }

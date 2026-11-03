@@ -1,5 +1,5 @@
 import "./Tap.scss"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useUserContext } from "../../context/UserContext"
 import blockService from "../../services/block.service"
 import ServerImage from "../../components/ServerImage/ServerImage"
@@ -8,7 +8,9 @@ import { CoinIcon } from "../../utils/icons"
 import { API_CONF } from "../../config/api.config"
 import { formatNumber } from "../../utils/format"
 import { haptic } from "../../utils/telegram"
-import { burstChips, burstEffects, hurtMob, punchBlock, shatterBlock, showTapNumber, swingTool } from "./tapEffects"
+import { burstEffects, hurtMob, punchBlock, shatterBlock, showTapNumber, swingTool } from "./tapEffects"
+import particles, { navTarget } from "../../utils/particles"
+import { critPower, isCritical } from "../../utils/critical"
 import { EFFECTS } from "../../config/effects.config"
 import { LOCATION_NAMES } from "../../config/quests.config"
 import { gameName, itemName, t } from "../../i18n"
@@ -24,8 +26,12 @@ const ACTIVE_BLOCK_KEY = "activeBlockId"
 const ACTIVE_MOB_KEY = "activeMobSlug"
 const LOCATION_ORDER = Object.keys(LOCATION_NAMES)
 const CRACK_STAGES = 8
-const TAP_CHIPS = 3
-const BREAK_CHIPS = 14
+const TAP_DEBRIS = 4
+const BREAK_DEBRIS = 18
+const MOB_DEBRIS = 2
+// Предмети з однієї відповіді вилітають по черзі, але не більше кількох: решту видно в підказці
+const FLYING_ITEMS = 4
+const ITEM_STAGGER_S = 0.12
 const DROP_VISIBLE_MS = 1800
 // Покинутий блок загоюється: тріщини зникають по одній стадії
 const CRACK_HOLD_MS = 1500
@@ -95,6 +101,10 @@ function Tap() {
     const nextDropId = useRef(0)
     const timers = useRef(new Set())
     const tapCoinsRef = useRef(0)
+    // Пошук предмета дропа за slug серед ~1700 предметів каталогу на кожну відповідь сервера
+    const itemBySlug = useMemo(() => new Map((catalog?.items ?? []).map(item => [item.slug, item])), [catalog])
+    // Номер наступного тапу: за ним клієнт знає, який удар сервер порахує критичним
+    const tapCountRef = useRef(user.tapCount ?? 0)
 
     const activeBlock = userBlocks.find(block => block._id === selectedBlockId) ?? userBlocks[0] ?? null
     const { level, cost } = user.upgrade
@@ -144,6 +154,33 @@ function Tap() {
         return () => pendingTimers.forEach(clearTimeout)
     }, [])
 
+    // Частинки малюються поверх усього вікна: зі сторінки гри вони не мають долітати на інші вкладки
+    useEffect(() => () => particles.clear(), [])
+
+    // Текстура для осколків готується заздалегідь, щоб перший удар уже мав частинки блока
+    useEffect(() => {
+        if (target?.icon) particles.preload(API_CONF.baseFileUrl + target.icon)
+    }, [target?.icon])
+
+    // Відкрита панель перекриває сцену: недограні частинки не мають висіти поверх неї
+    useEffect(() => {
+        if (sheet) particles.clear()
+    }, [sheet])
+
+    // Дроп вилітає з блока, гойдається і летить у кнопку інвентаря, як предмет, який підбирає гравець
+    const flyDrops = entries => {
+        const art = blockArt.current?.getBoundingClientRect()
+        if (!art || document.visibilityState !== "visible") return
+        const x = art.left + art.width / 2
+        const y = art.top + art.height * 0.45
+        const groundY = art.bottom - art.height * 0.08
+        entries.slice(0, FLYING_ITEMS).forEach(({ slug }, index) => {
+            const item = itemBySlug.get(slug)
+            if (!item) return
+            particles.item(x, y, API_CONF.baseFileUrl + item.icon, { groundY, delay: index * ITEM_STAGGER_S, ...navTarget("/inventory") })
+        })
+    }
+
     const addDropToasts = added => {
         setDrops(current => [...current, ...added].slice(-3))
         const ids = new Set(added.map(drop => drop.id))
@@ -151,23 +188,28 @@ function Tap() {
     }
 
     const showDrops = (entries, broken = false) => addDropToasts(entries.slice(0, 3)
-        .map(({ slug, quantity }) => ({ id: nextDropId.current++, quantity, broken, item: catalog?.items.find(item => item.slug === slug) }))
+        .map(({ slug, quantity }) => ({ id: nextDropId.current++, quantity, broken, item: itemBySlug.get(slug) }))
         .filter(drop => drop.item))
 
     const queue = useTapQueue({
         send: sendTapsBlock,
         // Сервер міг прийняти менше тапів: показуємо його баланс разом із ще не надісланими
         onSuccess: (result, pendingTaps) => {
+            if (typeof result.user.tapCount === "number") tapCountRef.current = result.user.tapCount + pendingTaps
             setUser(prev => ({
                 ...prev,
                 balance: result.user.balance + pendingTaps * tapCoinsRef.current,
                 tapProgress: result.user.tapProgress,
+                tapCount: result.user.tapCount,
                 loadout: result.loadout,
                 questsReady: result.questsReady,
             }))
             // Коли черга порожня, тріщини мають збігатися із сервером: він міг прийняти не всі тапи
             if (!pendingTaps) setProgress(prev => ({ ...prev, ...result.user.tapProgress }))
-            if (result.drops?.length) showDrops(result.drops)
+            if (result.drops?.length) {
+                showDrops(result.drops)
+                flyDrops(result.drops)
+            }
             else if (result.missed) addDropToasts([{ id: nextDropId.current++, missed: true }])
             if (result.card) {
                 setRevealed({ ...result.card, id: nextDropId.current++ })
@@ -217,21 +259,29 @@ function Tap() {
         lastHit.current = Date.now()
         setUser(prev => ({ ...prev, balance: prev.balance + coinsPerTap }))
 
-        const hit = blockProgress + power
+        // Крит рахує сервер тим самим хешем; тут лише передбачення, щоб удар одразу виглядав критичним
+        const critical = isCritical(user._id, tapCountRef.current)
+        tapCountRef.current += 1
+        const hitPower = critical ? critPower(power, perBlock) : power
+        const hit = blockProgress + hitPower
         const broke = hit >= perBlock
         setProgress(prev => ({ ...prev, [target.key]: hit % perBlock }))
 
         const bounds = fxLayer.current.getBoundingClientRect()
         const x = clientX - bounds.left
         const y = clientY - bounds.top
-        showTapNumber(fxLayer.current, x, y, coinsPerTap)
-        burstChips(fxLayer.current, x, y, API_CONF.baseFileUrl + target.icon, broke ? BREAK_CHIPS : TAP_CHIPS)
+        const art = blockArt.current.getBoundingClientRect()
+        const iconUrl = API_CONF.baseFileUrl + target.icon
+        const debris = activeMob ? MOB_DEBRIS : broke ? BREAK_DEBRIS : TAP_DEBRIS
+        showTapNumber(fxLayer.current, x, y, coinsPerTap, critical ? t("Крит!") : null)
+        particles.debris(clientX, clientY, iconUrl, debris, { groundY: art.bottom - art.height * 0.06, power: broke ? 1.25 : 1 })
+        if (critical) particles.crit(clientX, clientY, { magic: Boolean(tool && Object.keys(tool.enchantments).length) })
         burstEffects(fxLayer.current, x, y, effects.map(effect => EFFECTS[effect.id]?.color))
         if (tool) swingTool(fxLayer.current, x, y, API_CONF.baseFileUrl + tool.icon)
-        punchBlock(blockArt.current, broke)
+        punchBlock(blockArt.current, broke || critical)
         if (activeMob) hurtMob(blockArt.current)
         else if (broke) shatterBlock(blockArt.current)
-        haptic(broke ? "break" : "tap")
+        haptic(broke || critical ? "break" : "tap")
     }
 
     const handlePointerDown = event => {

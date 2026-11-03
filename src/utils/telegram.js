@@ -33,6 +33,18 @@ function haptic(kind) {
     if (supports("6.1")) HAPTICS[kind](webApp().HapticFeedback)
 }
 
+// Системна кнопка «Назад» у шапці Telegram. Повертає функцію, що прибирає обробник
+function showBackButton(onBack) {
+    const button = supports("6.1") ? webApp().BackButton : null
+    if (!button) return () => { }
+    button.onClick(onBack)
+    button.show()
+    return () => {
+        button.offClick(onBack)
+        button.hide()
+    }
+}
+
 // Посилання з чату відкривається у вбудованому браузері Telegram, де підпису немає. Гравця веде назад у застосунок
 function reopenInTelegram() {
     const insideTelegram = /Telegram/i.test(navigator.userAgent) || Boolean(window.TelegramWebview || window.TelegramWebviewProxy)
@@ -48,4 +60,4 @@ function shareLink(url, text) {
     else window.open(share, "_blank", "noopener")
 }
 
-export { GAME_LINK, setupTelegram, reopenInTelegram, haptic, referralLink, shareLink }
+export { GAME_LINK, setupTelegram, reopenInTelegram, haptic, referralLink, shareLink, showBackButton }

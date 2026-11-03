@@ -1,9 +1,11 @@
 const mode = import.meta.env.MODE;
 
+// VITE_API_URL у .env.local змінює адресу сервера без правки коду (наприклад, тестовий сервер на іншому порту)
+const DEFAULT_SERVER = mode === "production" ? "https://stump-facial-tannery.ngrok-free.dev" : "http://localhost:6788"
+
 const CLIENT_CONF = {
     mode,
-    serverUrl: mode === "production" ?
-        `https://stump-facial-tannery.ngrok-free.dev` : "http://localhost:6788"
+    serverUrl: import.meta.env.VITE_API_URL || DEFAULT_SERVER
 }
 
 const API_CONF = {

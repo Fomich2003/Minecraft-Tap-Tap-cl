@@ -130,7 +130,7 @@ img {
 }
 
 .content > main {
-  animation: mc-page-in 240ms var(--ease-out) backwards;
+  animation: mc-page-in 380ms var(--ease-out) backwards;
 }
 
 .content--game,
@@ -271,7 +271,7 @@ img {
 }
 
 @keyframes mc-page-in {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: none; }
 }
 
@@ -337,4 +337,15 @@ img {
   #Quests .Quests__gain {
     animation: mc-fade-hold 1500ms linear both !important;
   }
+}
+
+// Частинки гри поверх усього: предмет летить до кнопки інвентаря, монети до балансу в шапці
+.mc-particles {
+  position: fixed;
+  z-index: 1001;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  image-rendering: pixelated;
 }

@@ -366,5 +366,9 @@
   "Ще одна карта": "Another copy",
   "Зібрати різних карт: {count}": "Collect different cards: {count}",
   "Некоректна колода": "Invalid deck",
-  "Цієї карти ще немає": "You don't have this card yet"
+  "Цієї карти ще немає": "You don't have this card yet",
+  "Крит!": "Crit!",
+  "Забагато запитів, зачекай трохи": "Too many requests, wait a moment",
+  "Некоректний запит": "Invalid request",
+  "Тижневі": "Weekly"
 }

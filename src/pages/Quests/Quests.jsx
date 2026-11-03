@@ -8,6 +8,7 @@ import { formatRemaining } from "../../utils/convertTime"
 import { formatNumber } from "../../utils/format"
 import { haptic } from "../../utils/telegram"
 import { itemName, t } from "../../i18n"
+import { rewardBurst } from "../../utils/particles"
 
 // З ланцюжка постійних квестів видно лише наступний крок, інакше список на пів сотні карток нічого не підказує
 function currentSteps(quests) {
@@ -55,7 +56,7 @@ function QuestCard({ quest, index, catalog, busy, onClaim }) {
                     <QuestReward quest={quest} catalog={catalog} />
                 </div>
             </div>
-            {quest.ready && <button className="mc-btn mc-btn--gold mc-btn--small Quests__claim" disabled={busy} onClick={() => onClaim(quest)}>{t("Забрати")}</button>}
+            {quest.ready && <button className="mc-btn mc-btn--gold mc-btn--small Quests__claim" disabled={busy} onClick={event => onClaim(quest, event.currentTarget)}>{t("Забрати")}</button>}
             {quest.claimed && <span className="Quests__done">{t("Отримано")}</span>}
         </article>
     )
@@ -91,10 +92,13 @@ function Quests() {
 
     const shown = useMemo(() => {
         if (!quests) return []
-        return [...(tab === "daily" ? quests.daily : currentSteps(quests.permanent))].sort(byUrgency)
+        const list = tab === "permanent" ? currentSteps(quests.permanent) : quests[tab] ?? []
+        return [...list].sort(byUrgency)
     }, [quests, tab])
 
-    const claim = async quest => {
+    const claim = async (quest, button) => {
+        // Кнопка зникне разом зі старою карткою, тому звідки летіти нагороді, запам'ятовується наперед
+        const origin = button?.getBoundingClientRect()
         setBusy(true)
         setMessage("")
         const result = await claimQuest(quest.id)
@@ -102,6 +106,7 @@ function Quests() {
         if (result.success) {
             setQuests(result)
             setGained(quest)
+            if (origin) rewardBurst(origin.left + origin.width / 2, origin.top + origin.height / 2, { coins: result.reward?.coins, xp: result.reward?.xp })
             haptic("success")
         } else {
             setMessage(result.message)
@@ -113,6 +118,9 @@ function Quests() {
     if (!quests) return <main id="Quests"><p className="Quests__status">{t("Завантаження...")}</p></main>
 
     const dailyReady = quests.daily.filter(quest => quest.ready).length
+    const weeklyReady = (quests.weekly ?? []).filter(quest => quest.ready).length
+    // Тиждень завжди закінчується опівночі понеділка, тому новий набір приходить разом із щоденним
+    const weeklyResetsAt = quests.weeklyResetsAt ? new Date(quests.weeklyResetsAt).getTime() : resetsAt
     const permanentReady = quests.permanent.filter(quest => quest.ready).length
     const permanentDone = quests.permanent.filter(quest => quest.claimed).length
 
@@ -120,7 +128,7 @@ function Quests() {
         <main id="Quests">
             <h1 className="visually-hidden">{t("Квести")}</h1>
             <div className="Quests__tabs" role="tablist">
-                {[["daily", t("Щоденні"), dailyReady], ["permanent", t("Постійні"), permanentReady]].map(([id, label, ready]) => (
+                {[["daily", t("Щоденні"), dailyReady], ["weekly", t("Тижневі"), weeklyReady], ["permanent", t("Постійні"), permanentReady]].map(([id, label, ready]) => (
                     <button key={id} role="tab" aria-selected={tab === id} className={`Quests__tab${tab === id ? " Quests__tab--active" : ""}`} onClick={() => setTab(id)}>
                         {label}{ready > 0 && <span className="Quests__badge">{ready}</span>}
                     </button>
@@ -128,8 +136,8 @@ function Quests() {
             </div>
 
             <p className="Quests__summary">
-                {tab === "daily"
-                    ? <><span>{t("Нові квести через")}</span> <time>{formatRemaining(resetsAt - now)}</time></>
+                {tab !== "permanent"
+                    ? <><span>{t("Нові квести через")}</span> <time>{formatRemaining((tab === "weekly" ? weeklyResetsAt : resetsAt) - now)}</time></>
                     : <span>{t("Виконано {done} з {total}", { done: permanentDone, total: quests.permanent.length })}</span>}
             </p>
 
