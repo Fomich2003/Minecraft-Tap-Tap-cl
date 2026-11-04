@@ -517,22 +517,25 @@ function Tap() {
                     <i style={{ width: `${Math.min(100, user.balance / cost * 100)}%` }} />
                 </div>
 
-                {/* Прив'язані до панелі: її висота залежить від шрифту мови */}
-                <div className="Tap__drops" role="status">
-                    {drops.map(drop => (
-                        drop.missed
-                            ? <span key={drop.id} className="Tap__drop Tap__drop--missed"><span>{t("Нічого не випало")}</span></span>
-                            : <span key={drop.id} className={`Tap__drop${drop.broken ? " Tap__drop--broken" : ""}`}>
-                                <ServerImage imgSrc={drop.item.icon} alt="" />
-                                <span>{drop.broken ? t("Зламався інструмент: {name}", { name: itemName(drop.item) }) : `+${drop.quantity} ${itemName(drop.item)}`}</span>
-                            </span>
-                    ))}
-                </div>
+                {/* Лівий стовпчик під панеллю: годинник зверху, лут під ним, щоб годинник не перекривав дроп.
+                    Прив'язаний до панелі, бо її висота залежить від шрифту мови */}
+                <div className="Tap__corner">
+                    {/* Годинник гри показує справжню пору доби в регіоні гравця */}
+                    <div className="Tap__sky" role="img" aria-label={`${clockTime} · ${skyLabel}`}>
+                        <i className="Tap__clock" style={{ backgroundPositionY: `${sky.clock / (CLOCK_FRAMES - 1) * 100}%` }} />
+                        <span>{clockTime}</span>
+                    </div>
 
-                {/* Годинник гри показує справжню пору доби в регіоні гравця */}
-                <div className="Tap__sky" role="img" aria-label={`${clockTime} · ${skyLabel}`}>
-                    <i className="Tap__clock" style={{ backgroundPositionY: `${sky.clock / (CLOCK_FRAMES - 1) * 100}%` }} />
-                    <span>{clockTime}</span>
+                    <div className="Tap__drops" role="status">
+                        {drops.map(drop => (
+                            drop.missed
+                                ? <span key={drop.id} className="Tap__drop Tap__drop--missed"><span>{t("Нічого не випало")}</span></span>
+                                : <span key={drop.id} className={`Tap__drop${drop.broken ? " Tap__drop--broken" : ""}`}>
+                                    <ServerImage imgSrc={drop.item.icon} alt="" />
+                                    <span>{drop.broken ? t("Зламався інструмент: {name}", { name: itemName(drop.item) }) : `+${drop.quantity} ${itemName(drop.item)}`}</span>
+                                </span>
+                        ))}
+                    </div>
                 </div>
 
                 <div className="Tap__status">
