@@ -23,3 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# VPS deploy script and its log
+deploy.sh
+deploy.log
