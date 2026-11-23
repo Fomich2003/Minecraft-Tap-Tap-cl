@@ -1,0 +1,44 @@
+# Фронтенд: https://tap-tap.fomka.online → nginx на хості → 127.0.0.1:8080 → цей контейнер
+#
+# Запуск (з теки, де лежить цей файл):   docker compose up -d --build
+# Логи:                                   docker compose logs -f
+# Зупинка:                                docker compose down
+
+name: tap-tap-client
+
+services:
+  client:
+    build:
+      context: .
+      args:
+        VITE_API_URL: https://api-tap-tap.fomka.online
+    image: tap-tap-client:latest
+    container_name: tap-tap-client
+    restart: unless-stopped
+
+    # Тільки localhost: назовні сайт видно лише через nginx хоста
+    ports:
+      - "127.0.0.1:8080:8080"
+
+    # nginx-unprivileged пише лише pid і тимчасові файли в /tmp
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+    # pids саме тут, а не окремим pids_limit: Compose не дозволяє задавати обидва
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+          pids: 64
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

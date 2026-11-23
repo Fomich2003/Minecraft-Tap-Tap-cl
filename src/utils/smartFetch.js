@@ -4,10 +4,13 @@ import { t } from "../i18n"
 const GENERIC_ERROR = "Ой! Щось пішло не так, спробуйте пізніше..."
 const CYRILLIC = /[а-яіїєґ]/i
 
+// Безплатний ngrok без цього заголовка віддає сторінку попередження замість відповіді сервера.
+// Потрібен лише коли VITE_API_URL веде на тунель (тест із телефона), на справжньому домені зайвий
+const NGROK_HEADERS = /ngrok/i.test(API_CONF.baseUrl) ? { "ngrok-skip-browser-warning": "1" } : {}
+
 async function smartFetch(path, options = {}) {
     try {
-        // Безплатний ngrok інакше віддає сторінку попередження замість відповіді сервера
-        const response = await fetch(API_CONF.baseUrl + path, { ...options, headers: { ...options.headers, "ngrok-skip-browser-warning": "1" } })
+        const response = await fetch(API_CONF.baseUrl + path, { ...options, headers: { ...options.headers, ...NGROK_HEADERS } })
         const data = await response.json()
 
 
